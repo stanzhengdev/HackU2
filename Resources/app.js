@@ -10,4 +10,5 @@ if (Ti.version < 1.8 ) {
 (function() {
     var Window = require('ApplicationWindow');
     new Window().open({fullscreen:true, navBarHidden:true, exitOnClose:true});
+    var _ = require('lib/underscore')._;
 })();
