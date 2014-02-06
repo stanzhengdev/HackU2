@@ -30,6 +30,10 @@ function MainScene(window, game) {
 
     var started = false;
 
+    var jostleId = -1;
+    var jostleOrigY;
+    var jostleNow = 0;
+
     var bikeSprites = [
         'assets/cycle1.png',
         'assets/cycle2.png',
@@ -58,6 +62,16 @@ function MainScene(window, game) {
         'assets/cycle10.png'
     ];
 
+    var jostleBike = function() {
+        jostleId = Math.floor(bikes.length * Math.random());
+        if (typeof(bikes[jostleId]) != 'undefined') {
+            jostleOrigY = bikes[jostleId].y;
+            jostleNow = 0;
+        } else {
+        	jostleId = -1;
+        }
+    };
+
     var updateTimer = function(e) {
         var bikesToRemove = [];
         for (var i in bikes) {
@@ -68,11 +82,25 @@ function MainScene(window, game) {
                 if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
                     self.remove(bikes[i]);
                     bikesToRemove.push(bikes[i]);
+                    if (i == jostleId) {
+                        jostleId = -1;
+                    }
                 }
             }
         }
 
+        if(jostleNow > 10) {
+            bikes[jostleId].y = jostleOrigY;
+            jostleId = -1;
+        }
+
         bikes = _.difference(bikes, bikesToRemove);
+        
+        if (jostleId >= 0 && jostleId < bikes.length) {
+            bikes[jostleId].y = jostleOrigY + (Math.sin(jostleNow++) * 3.0);
+        } else {
+            jostleBike();
+        }
     };
 
     var spawnOuterLaneBikes = function (e) {
@@ -98,7 +126,7 @@ function MainScene(window, game) {
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
-    }
+    };
 
     var spawnInnerLaneBikes = function (e) {
         var newBike;
@@ -122,7 +150,7 @@ function MainScene(window, game) {
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
-    }
+    };
 
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
