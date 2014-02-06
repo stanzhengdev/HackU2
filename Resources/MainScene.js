@@ -55,10 +55,6 @@ function MainScene(window, game) {
         track.transform(trackTransform);
     };
 
-    var trackTransformCompleted = function(e) {
-        zoomOut();
-    };
-
     var handleTouch = function(_e) {
         var e =  {type:_e.type, source:_e.source};
         e.x = _e.x * game.touchScaleX;
