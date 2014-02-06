@@ -35,7 +35,6 @@ function MainScene(window, game) {
 
     var started = false;
 
-    var pubnub = null;
     var useMultiplayer = true;
 
     var myUUID = null;
