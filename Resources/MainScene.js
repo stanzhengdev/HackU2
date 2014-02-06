@@ -9,8 +9,6 @@ function MainScene(window, game) {
 
     var debug = true;
 
-    var updateTimerID = 0;
-
     // Create scene
     var self = alloy.createScene();
 
@@ -23,36 +21,91 @@ function MainScene(window, game) {
     var lookAtTransform  = null;
     var zoomOutTransform = null;
 
-    var cars = [];
+    var bikes = [];
 
-    var DEFAULT_CAR_SPEED = 5;
-    var DEFAULT_CAR_SPEED_WITH_BRAKE = 3;
-    var carSpeed = DEFAULT_CAR_SPEED;
+    var OUTER_LANE_SPEED = 5;
+    var INNER_LANE_SPEED = 10;
 
     var started = false;
 
+    var bikeSprites = [
+        'assets/cycle1.png',
+        'assets/cycle2.png',
+        'assets/cycle3.png',
+        'assets/cycle4.png',
+        'assets/cycle5.png',
+        'assets/cycle6.png',
+        'assets/cycle7.png'
+    ];
+
     var updateTimer = function(e) {
-        for (var i in cars) {
-            cars[i].x += cars[i].velX;
-            cars[i].y += cars[i].velY;
+        for (var i in bikes) {
+            bikes[i].x += bikes[i].velX;
+            bikes[i].y += bikes[i].velY;
 
-            if (cars[i].x > track.width + cars[i].width && cars[i].velX > 0) {
-                cars[i].x = -100;
+            if (bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) {
+                //TODO remove object
             }
 
-            if (cars[i].x < -100 && cars[i].velX < 0) {
-                cars[i].x = track.width + cars[i].width + 100;
+            if (bikes[i].x < -100 && bikes[i].velX < 0) {
+                //TODO remove object
             }
-        }
-
-        if (cars[0].collidesWith(cars[1])) {
-            cars[0].x = -100;
-            cars[1].x = 500;
         }
     };
 
+    var spawnOuterLaneBikes = function (e) {
+        var newBike;
+        var spriteImage = bikeSprites[Math.floor((Math.random()*bikeSprites.length))];
+
+        if (Math.random() > 0.5) {
+            newBike = alloy.createSprite({image:spriteImage});
+            newBike.velX = OUTER_LANE_SPEED;
+            newBike.velY = 0;
+            newBike.x = -newBike.width;
+            newBike.y = 530;
+        } else {
+            newBike = alloy.createSprite({image:spriteImage});
+            newBike.velX = -OUTER_LANE_SPEED;
+            newBike.velY = 0;
+            newBike.x = track.width + newBike.width;
+            newBike.y = 100;
+            newBike.scaleX = -1;
+        }
+
+        newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
+        newBike.z = track.z + 1;
+        self.add(newBike);
+        bikes.push(newBike);
+    }
+
+    var spawnInnerLaneBikes = function (e) {
+        var newBike;
+        var spriteImage = bikeSprites[Math.floor((Math.random()*bikeSprites.length))];
+
+        if (Math.random() > 0.5) {
+            newBike = alloy.createSprite({image:spriteImage});
+            newBike.velX = INNER_LANE_SPEED;
+            newBike.x = -newBike.width;
+            newBike.y = 400;
+        } else {
+            newBike = alloy.createSprite({image:spriteImage});
+            newBike.velX = -INNER_LANE_SPEED;
+            newBike.x = track.width + newBike.width;
+            newBike.y = 230;
+            newBike.scaleX = -1;
+        }
+
+        newBike.velY = 0;
+        newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
+        newBike.z = track.z + 1;
+        self.add(newBike);
+        bikes.push(newBike);
+    }
+
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
+        setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+1500));
+        setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+1500));
     };
 
     var titleScreenTransformCompleted = function(e) {
@@ -112,27 +165,8 @@ function MainScene(window, game) {
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
-        cars = [];
+        bikes = [];
         started = false;
-
-        cars[0] = alloy.createSprite({image:'graphics/car1.png'});
-        cars[0].velX = DEFAULT_CAR_SPEED;
-        cars[0].velY = 0;
-        cars[0].x = -cars[0].width;
-        cars[0].y = 250;
-
-        cars[1] = alloy.createSprite({image:'graphics/car2.png'});
-        cars[1].velX = -DEFAULT_CAR_SPEED;
-        cars[1].velY = 0;
-        cars[1].x = -cars[0].width;
-        cars[1].y = 250;
-        cars[1].angle = 180;
-
-
-        if (updateTimerID > 0) {
-            clearInterval(updateTimerID);
-            updateTimerID = 0;
-        }
 
         if (track === null) {
             track = alloy.createSprite({image:'assets/background.png'});
@@ -169,12 +203,6 @@ function MainScene(window, game) {
         self.add(titleScreen);
         self.add(track);
 
-        for (var i in cars) {
-            cars[i].rotationCenter = {x:cars[i].width * 0.5, y:cars[i].height * 0.5};
-            cars[i].z = track.z + 1;
-            self.add(cars[i]);
-        }
-
         game.addEventListener('touchstart', handleTouch);
         game.addEventListener('touchmove',  handleTouch);
         game.addEventListener('touchend',   handleTouch);
@@ -193,11 +221,6 @@ function MainScene(window, game) {
         game.removeEventListener('touchstart', handleTouch);
         game.removeEventListener('touchmove',  handleTouch);
         game.removeEventListener('touchend',   handleTouch);
-    });
-
-    // Stop update timer before app is closed
-    window.addEventListener('android:back', function(e) {
-        clearInterval(updateTimerID);
     });
 
     return self;
