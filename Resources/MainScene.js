@@ -1,3 +1,4 @@
+var _ = require('libs/underscore-min')._;
 /*
  * Shooter game example
  *
@@ -6,6 +7,7 @@
 var alloy = require('co.lanica.platino');
 
 function MainScene(window, game) {
+    var _ = require('libs/underscore-min')._;
 
     var debug = true;
 
@@ -38,7 +40,9 @@ function MainScene(window, game) {
         'assets/cycle7.png',
         'assets/cycle8.png',
         'assets/cycle9.png',
-        'assets/cycle10.png'
+        'assets/cycle10.png',
+        'assets/bus1.png',
+        'assets/bus2.png'
     ];
 
     var pedestrianSprites = [
@@ -55,15 +59,20 @@ function MainScene(window, game) {
     ];
 
     var updateTimer = function(e) {
+        var bikesToRemove = [];
         for (var i in bikes) {
-            bikes[i].x += bikes[i].velX;
-            bikes[i].y += bikes[i].velY;
+            if (bikes[i] != undefined) {
+                bikes[i].x += bikes[i].velX;
+                bikes[i].y += bikes[i].velY;
 
-            if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
-                self.remove(bikes[i]);
-                bikes = _.without(bikes, bikes[i]);
+                if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
+                    self.remove(bikes[i]);
+                    bikesToRemove.push(bikes[i]);
+                }
             }
         }
+
+        bikes = _.difference(bikes, bikesToRemove);
     };
 
     var spawnOuterLaneBikes = function (e) {
@@ -75,13 +84,13 @@ function MainScene(window, game) {
             newBike.velX = OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = -newBike.width;
-            newBike.y = 540;
+            newBike.y = 520;
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = track.width + newBike.width;
-            newBike.y = 100;
+            newBike.y = 90;
             newBike.scaleX = -1;
         }
 
@@ -99,12 +108,12 @@ function MainScene(window, game) {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = INNER_LANE_SPEED;
             newBike.x = -newBike.width;
-            newBike.y = 410;
+            newBike.y = 400;
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -INNER_LANE_SPEED;
             newBike.x = track.width + newBike.width;
-            newBike.y = 230;
+            newBike.y = 210;
             newBike.scaleX = -1;
         }
 
