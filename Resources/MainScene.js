@@ -31,13 +31,10 @@ function MainScene(window, game) {
 
     var started = false;
 
-    var myCarIndex = 0;
-
     var updateTimer = function(e) {
         for (var i in cars) {
             cars[i].x += cars[i].velX;
             cars[i].y += cars[i].velY;
-            cars[i].z += cars[i].velX;
 
             if (cars[i].x > track.width + cars[i].width && cars[i].velX > 0) {
                 cars[i].x = -100;
@@ -105,9 +102,6 @@ function MainScene(window, game) {
         zoomOutTransform.lookAt_eyeZ = defaultCamera.eyeZ;
 
         game.moveCamera(zoomOutTransform);
-        cars[myCarIndex].x = -cars[myCarIndex].width;
-        cars[myCarIndex].y = 550;
-        cars[myCarIndex].z = track.z + 1;
     }
 
     self.addEventListener('activated', function(e) {
@@ -116,9 +110,19 @@ function MainScene(window, game) {
         cars = [];
         started = false;
 
-        cars[myCarIndex] = alloy.createSprite({image:'graphics/car1.png'});
-        cars[myCarIndex].velX = DEFAULT_CAR_SPEED;
-        cars[myCarIndex].velY = 0;
+        cars[0] = alloy.createSprite({image:'graphics/car1.png'});
+        cars[0].velX = DEFAULT_CAR_SPEED;
+        cars[0].velY = 0;
+        cars[0].x = -cars[0].width;
+        cars[0].y = 550;
+
+        cars[1] = alloy.createSprite({image:'graphics/car2.png'});
+        cars[1].velX = -DEFAULT_CAR_SPEED;
+        cars[1].velY = 0;
+        cars[1].x = -cars[0].width;
+        cars[1].y = 250;
+        cars[1].angle = 180;
+
 
         if (updateTimerID > 0) {
             clearInterval(updateTimerID);
@@ -155,15 +159,16 @@ function MainScene(window, game) {
         titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
         trackTransform.addEventListener('complete', zoomOut);
 
-
-        cars[myCarIndex].rotationCenter = {x:cars[myCarIndex].width * 0.5, y:cars[myCarIndex].height * 0.5};
-
         track.hide();
 
         self.add(titleScreen);
         self.add(track);
 
-        self.add(cars[myCarIndex]);
+        for (var i in cars) {
+            cars[i].rotationCenter = {x:cars[i].width * 0.5, y:cars[i].height * 0.5};
+            cars[i].z = track.z + 1;
+            self.add(cars[i]);
+        }
 
         game.addEventListener('touchstart', handleTouch);
         game.addEventListener('touchmove',  handleTouch);
