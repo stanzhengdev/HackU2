@@ -44,6 +44,11 @@ function MainScene(window, game) {
                 cars[i].x = track.width + cars[i].width + 100;
             }
         }
+
+        if (cars[0].collidesWith(cars[1])) {
+            cars[0].x = -100;
+            cars[1].x = 500;
+        }
     };
 
     var zoomOutCompleted = function(e) {
@@ -114,7 +119,7 @@ function MainScene(window, game) {
         cars[0].velX = DEFAULT_CAR_SPEED;
         cars[0].velY = 0;
         cars[0].x = -cars[0].width;
-        cars[0].y = 550;
+        cars[0].y = 250;
 
         cars[1] = alloy.createSprite({image:'graphics/car2.png'});
         cars[1].velX = -DEFAULT_CAR_SPEED;
@@ -130,7 +135,7 @@ function MainScene(window, game) {
         }
 
         if (track === null) {
-            track = alloy.createSprite({image:'graphics/basictrack.png'});
+            track = alloy.createSprite({image:'assets/background.png'});
             track.tag = "TRACK";
         }
 
