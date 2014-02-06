@@ -35,7 +35,23 @@ function MainScene(window, game) {
         'assets/cycle4.png',
         'assets/cycle5.png',
         'assets/cycle6.png',
-        'assets/cycle7.png'
+        'assets/cycle7.png',
+        'assets/cycle8.png',
+        'assets/cycle9.png',
+        'assets/cycle10.png'
+    ];
+
+    var pedestrianSprites = [
+        'assets/cycle1.png',
+        'assets/cycle2.png',
+        'assets/cycle3.png',
+        'assets/cycle4.png',
+        'assets/cycle5.png',
+        'assets/cycle6.png',
+        'assets/cycle7.png',
+        'assets/cycle8.png',
+        'assets/cycle9.png',
+        'assets/cycle10.png'
     ];
 
     var updateTimer = function(e) {
@@ -43,12 +59,9 @@ function MainScene(window, game) {
             bikes[i].x += bikes[i].velX;
             bikes[i].y += bikes[i].velY;
 
-            if (bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) {
-                //TODO remove object
-            }
-
-            if (bikes[i].x < -100 && bikes[i].velX < 0) {
-                //TODO remove object
+            if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
+                self.remove(bikes[i]);
+                bikes = _.without(bikes, bikes[i]);
             }
         }
     };
@@ -62,7 +75,7 @@ function MainScene(window, game) {
             newBike.velX = OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = -newBike.width;
-            newBike.y = 530;
+            newBike.y = 540;
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -OUTER_LANE_SPEED;
@@ -86,7 +99,7 @@ function MainScene(window, game) {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = INNER_LANE_SPEED;
             newBike.x = -newBike.width;
-            newBike.y = 400;
+            newBike.y = 410;
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -INNER_LANE_SPEED;
@@ -104,8 +117,8 @@ function MainScene(window, game) {
 
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
-        setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+1500));
-        setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+1500));
+        setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+2000));
+        setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+2000));
     };
 
     var titleScreenTransformCompleted = function(e) {
