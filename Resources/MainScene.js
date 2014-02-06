@@ -25,10 +25,16 @@ function MainScene(window, game) {
 
     var bikes = [];
 
+    var grandma;
+    var grandmaThrow;
+
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 10;
 
     var started = false;
+
+    var score = 0;
+    var scoreSprite;
 
     var bikeSprites = [
         'assets/cycle1.png',
@@ -58,21 +64,23 @@ function MainScene(window, game) {
         'assets/cycle10.png'
     ];
 
+    var isThrowing = false;
+
     var updateTimer = function(e) {
         var bikesToRemove = [];
         for (var i in bikes) {
-            if (bikes[i] != undefined) {
-                bikes[i].x += bikes[i].velX;
-                bikes[i].y += bikes[i].velY;
+            bikes[i].x += bikes[i].velX;
+            bikes[i].y += bikes[i].velY;
 
-                if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
-                    self.remove(bikes[i]);
-                    bikesToRemove.push(bikes[i]);
-                }
+            if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
+                self.remove(bikes[i]);
+                bikesToRemove.push(bikes[i]);
             }
         }
 
         bikes = _.difference(bikes, bikesToRemove);
+        score++;
+        scoreSprite.text = score;
     };
 
     var spawnOuterLaneBikes = function (e) {
@@ -84,21 +92,29 @@ function MainScene(window, game) {
             newBike.velX = OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = -newBike.width;
-            newBike.y = 520;
+            newBike.y = 510;
+            if (isThrowing) {
+                self.remove(grandmaThrow);
+                self.add(grandma);
+            }
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = track.width + newBike.width;
-            newBike.y = 90;
+            newBike.y = 70;
             newBike.scaleX = -1;
+            if (!isThrowing) {
+                self.remove(grandma);
+                self.add(grandmaThrow);
+            }
         }
 
         newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
-    }
+    };
 
     var spawnInnerLaneBikes = function (e) {
         var newBike;
@@ -108,12 +124,12 @@ function MainScene(window, game) {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = INNER_LANE_SPEED;
             newBike.x = -newBike.width;
-            newBike.y = 400;
+            newBike.y = 360;
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -INNER_LANE_SPEED;
             newBike.x = track.width + newBike.width;
-            newBike.y = 210;
+            newBike.y = 220;
             newBike.scaleX = -1;
         }
 
@@ -122,12 +138,26 @@ function MainScene(window, game) {
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
-    }
+    };
 
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
         setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+2000));
         setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+2000));
+
+        grandma = alloy.createSprite({image:'assets/grandma_1.png'});
+        grandma.x = (track.width - grandma.width) / 2;
+        grandma.y = track.height - grandma.height;
+        grandma.z = track.z + 10;
+        grandmaThrow = alloy.createSprite({image:'assets/grandma_2.png'});
+        grandmaThrow.x = (track.width - grandmaThrow.width) / 2;
+        grandmaThrow.y = track.height - grandmaThrow.height;
+        grandmaThrow.z = track.z + 10;
+        self.add(grandma);
+        scoreSprite = alloy.createTextSprite({text:'Lorem ipsum dolor sit amet.', fontSize:24});
+        scoreSprite.x = (track.width - scoreSprite.width) / 2;
+        scoreSprite.y = 0;
+        self.add(scoreSprite);
     };
 
     var titleScreenTransformCompleted = function(e) {
