@@ -72,7 +72,7 @@ function MainScene(window, game) {
         if (cars[myCarIndex].y < cars[myCarIndex].width) cars[myCarIndex].y = cars[myCarIndex].width;
         if (cars[myCarIndex].y > track.height - cars[myCarIndex].width) cars[myCarIndex].y = track.height - cars[myCarIndex].width;
 
-        checkCameraPosition();
+    //    checkCameraPosition();
     };
 
     var positionTimer = function(e) {
@@ -80,10 +80,10 @@ function MainScene(window, game) {
     };
 
     var zoomOutCompleted = function(e) {
-        lookAt(680, 1500, alloy.ANIMATION_CURVE_EASE_IN);
+        //lookAt(680, 1500, alloy.ANIMATION_CURVE_EASE_IN);
 
         setInterval(updateTimer, 33);
-        setInterval(positionTimer, 5000);
+        //setInterval(positionTimer, 5001);
     };
 
     var titleScreenTransformCompleted = function(e) {
@@ -206,7 +206,7 @@ function MainScene(window, game) {
         zoomOutTransform.lookAt_centerY = track.height * 0.5;
         zoomOutTransform.lookAt_eyeX = track.width  * 0.5;
         zoomOutTransform.lookAt_eyeY = track.height * 0.5;
-        zoomOutTransform.lookAt_eyeZ = defaultCamera.eyeZ * 2;
+        zoomOutTransform.lookAt_eyeZ = defaultCamera.eyeZ;
 
         game.moveCamera(zoomOutTransform);
     }
@@ -215,7 +215,7 @@ function MainScene(window, game) {
         Ti.API.info("main scene is activated");
 
 
-        setupPubNub();
+        //setupPubNub();
 
         myUUID = Titanium.Platform.createUUID();
 
@@ -237,7 +237,7 @@ function MainScene(window, game) {
         }
 
         if (track === null) {
-            track = alloy.createSprite({image:'graphics/track.png'});
+            track = alloy.createSprite({image:'graphics/basictrack.png'});
             track.tag = "TRACK";
         }
 
