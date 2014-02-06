@@ -33,12 +33,19 @@ function MainScene(window, game) {
 
     var myCarIndex = 0;
 
-    var braking = false;
-
     var updateTimer = function(e) {
         for (var i in cars) {
-            cars[i].x = track.width - cars[i].width;
-            cars[i].y = track.height - cars[i].width;
+            cars[i].x += cars[i].velX;
+            cars[i].y += cars[i].velY;
+            cars[i].z += cars[i].velX;
+
+            if (cars[i].x > track.width + cars[i].width && cars[i].velX > 0) {
+                cars[i].x = -100;
+            }
+
+            if (cars[i].x < -100 && cars[i].velX < 0) {
+                cars[i].x = track.width + cars[i].width + 100;
+            }
         }
     };
 
@@ -98,17 +105,20 @@ function MainScene(window, game) {
         zoomOutTransform.lookAt_eyeZ = defaultCamera.eyeZ;
 
         game.moveCamera(zoomOutTransform);
+        cars[myCarIndex].x = -cars[myCarIndex].width;
+        cars[myCarIndex].y = 550;
+        cars[myCarIndex].z = track.z + 1;
     }
 
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
-
         cars = [];
         started = false;
 
         cars[myCarIndex] = alloy.createSprite({image:'graphics/car1.png'});
-        cars.velX = DEFAULT_CAR_SPEED;
+        cars[myCarIndex].velX = DEFAULT_CAR_SPEED;
+        cars[myCarIndex].velY = 0;
 
         if (updateTimerID > 0) {
             clearInterval(updateTimerID);
@@ -145,9 +155,6 @@ function MainScene(window, game) {
         titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
         trackTransform.addEventListener('complete', zoomOut);
 
-        cars[myCarIndex].x = track.width * .5;
-        cars[myCarIndex].y = track.heigh * .5;
-        cars[myCarIndex].z = track.z + 1;
 
         cars[myCarIndex].rotationCenter = {x:cars[myCarIndex].width * 0.5, y:cars[myCarIndex].height * 0.5};
 
