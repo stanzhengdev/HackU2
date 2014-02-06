@@ -47,7 +47,7 @@ function ApplicationWindow() {
     game.touchScaleY = 1;
     
     // set screen size for your game (ipad size)
-    game.TARGET_SCREEN = {width:1024, height:768};
+    game.TARGET_SCREEN = {width:1280, height:800};
 
     function updateScreenSize() {
         // set screen size for your game (TARGET_SCREEN size)

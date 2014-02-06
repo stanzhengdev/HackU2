@@ -36,7 +36,6 @@ function MainScene(window, game) {
     var started = false;
 
     var pubnub = null;
-    var canUsePubNub   = true;
     var useMultiplayer = true;
 
     var myUUID = null;
@@ -72,18 +71,11 @@ function MainScene(window, game) {
         if (cars[myCarIndex].y < cars[myCarIndex].width) cars[myCarIndex].y = cars[myCarIndex].width;
         if (cars[myCarIndex].y > track.height - cars[myCarIndex].width) cars[myCarIndex].y = track.height - cars[myCarIndex].width;
 
-    //    checkCameraPosition();
-    };
-
-    var positionTimer = function(e) {
-        send_position();
     };
 
     var zoomOutCompleted = function(e) {
-        //lookAt(680, 1500, alloy.ANIMATION_CURVE_EASE_IN);
 
         setInterval(updateTimer, 33);
-        //setInterval(positionTimer, 5001);
     };
 
     var titleScreenTransformCompleted = function(e) {
@@ -214,9 +206,6 @@ function MainScene(window, game) {
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
-
-        //setupPubNub();
-
         myUUID = Titanium.Platform.createUUID();
 
         cars = [];
@@ -345,83 +334,6 @@ function MainScene(window, game) {
     window.addEventListener('android:back', function(e) {
         clearInterval(updateTimerID);
     });
-
-    function setupPubNub() {
-        if (!started) return;
-        if (!useMultiplayer) return;
-
-        // -------------------------------------
-        // INIT PUBNUB
-        // -------------------------------------
-        pubnub = require('pubnub').init({
-            publish_key   : 'pub-44d16618-cd6d-4d24-a53f-1e0c3892b25f',
-            subscribe_key : 'sub-ec91aa28-16ff-11e2-be37-e33ebb8fccd1',
-            ssl           : false,
-            origin        : 'pubsub.pubnub.com'
-        });
-
-        // -------------------------------------
-        // LISTEN FOR MESSAGES
-        // -------------------------------------
-        pubnub.subscribe({
-            channel  : 'codestrong_car',
-            connect  : function() {
-                Ti.API.info("subscribe:connect");
-            },
-            callback : function(message) {
-                // Ignore my own message
-                if (message.issuer == myUUID) return;
-
-                Ti.API.log("subscribe:callback " + JSON.stringify(message));
-                var index = 0;
-                if (message.command == "position") {
-                    index = parseInt(message.data.car, 10);
-                    if (index >= 0 && index < cars.length) {
-                        moveCar(index, message.data);
-                    }
-                }
-
-            },
-            error : function() {
-                Ti.API.info("subscribe:error");
-                canUsePubNub = false;
-            }
-        });
-
-    }
-
-    function send_position() {
-        var param = {car:myCarIndex,
-                x:cars[myCarIndex].x, y:cars[myCarIndex].y, angle:cars[myCarIndex].angle};
-        send_a_message("position", param);
-    }
-
-    // ----------------------------------
-    // SEND MESSAGE
-    // ----------------------------------
-    function send_a_message(command, data) {
-        // If we failed to subscribe, try to reconnect
-        if (pubnub === null || !canUsePubNub) {
-            setupPubNub();
-        }
-
-        if (pubnub === null) {
-            return;
-        }
-
-        pubnub.publish({
-            channel  : 'codestrong_car',
-            message  : { command : command, data : data, issuer : myUUID },
-            callback : function(info) {
-                if (info[0]) {
-                    Ti.API.log("Successfully Sent Message!");
-                }
-                if (!info[0]) {
-                    Ti.API.log("Failed Because: " + info[1]);
-                }
-            }
-        });
-    }
 
     return self;
 }
