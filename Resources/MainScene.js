@@ -133,6 +133,7 @@ function MainScene(window, game) {
         if (titleScreen === null) {
             titleScreen = alloy.createSprite({image:'graphics/titlescreen.png'});
             titleScreen.tag = "TITLE_SCREEN";
+
         }
 
         if (lookAtTransform === null) {
