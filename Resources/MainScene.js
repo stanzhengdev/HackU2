@@ -10,7 +10,6 @@ function MainScene(window, game) {
     var debug = true;
 
     var updateTimerID = 0;
-    var positionTimerID = 0;
 
     // Create scene
     var self = alloy.createScene();
@@ -26,54 +25,24 @@ function MainScene(window, game) {
 
     var cars = [];
 
-    var carControlPad = null;
-    var brakeButton   = null;
-
     var DEFAULT_CAR_SPEED = 5;
     var DEFAULT_CAR_SPEED_WITH_BRAKE = 3;
     var carSpeed = DEFAULT_CAR_SPEED;
 
     var started = false;
 
-    var useMultiplayer = true;
-
-    var myUUID = null;
     var myCarIndex = 0;
 
     var braking = false;
 
-    function moveCar(index, param) {
-        cars[index].x = param.x;
-        cars[index].y = param.y;
-        cars[index].angle = param.angle;
-    }
-
-    function checkCameraPosition() {
-        var diffX = Math.abs(cars[myCarIndex].x - game.camera.eyeX);
-        var diffY = Math.abs(cars[myCarIndex].y - game.camera.eyeY);
-
-        if (diffX > game.screen.width * 0.25) {
-            lookAt(cars[myCarIndex].x, cars[myCarIndex].y, alloy.ANIMATION_CURVE_LINEAR);
-        } else if (diffY > game.screen.height * 0.25) {
-            lookAt(cars[myCarIndex].x, cars[myCarIndex].y, alloy.ANIMATION_CURVE_LINEAR);
-        }
-    }
-
     var updateTimer = function(e) {
-        var r = cars[myCarIndex].angle * Math.PI / 180;
-        cars[myCarIndex].x = cars[myCarIndex].x + carSpeed * Math.cos(r);
-        cars[myCarIndex].y = cars[myCarIndex].y + carSpeed * Math.sin(r);
-
-        if (cars[myCarIndex].x < cars[myCarIndex].width) cars[myCarIndex].x = cars[myCarIndex].width;
-        if (cars[myCarIndex].x > track.width - cars[myCarIndex].width) cars[myCarIndex].x = track.width - cars[myCarIndex].width;
-
-        if (cars[myCarIndex].y < cars[myCarIndex].width) cars[myCarIndex].y = cars[myCarIndex].width;
-        if (cars[myCarIndex].y > track.height - cars[myCarIndex].width) cars[myCarIndex].y = track.height - cars[myCarIndex].width;
-
+        for (var i in cars) {
+            cars[i].x = track.width - cars[i].width;
+            cars[i].y = track.height - cars[i].width;
+        }
     };
 
     var zoomOutCompleted = function(e) {
-
         setInterval(updateTimer, 33);
     };
 
@@ -81,8 +50,6 @@ function MainScene(window, game) {
         started = true;
 
         track.show();
-        carControlPad.alpha = 0.5;
-        brakeButton.alpha   = 0.5;
 
         track.duration = 1500;
         track.transform(trackTransform);
@@ -92,24 +59,7 @@ function MainScene(window, game) {
         zoomOut();
     };
 
-    var handleCarControlPadAngle = 0;
-
-    var handleCarControlPad = function(e) {
-        var rX = carControlPad.center.x - e.x;
-        var rY = carControlPad.center.y - e.y;
-
-        var angle = (((Math.atan2(rY, rX) * 180 / Math.PI) - 90) % 360) * 0.8;
-        if (angle >  45 || angle < -45) return;
-
-        var angle0 = cars[myCarIndex].angle + (angle - handleCarControlPadAngle);
-
-        cars[myCarIndex].angle = angle0;
-
-        handleCarControlPadAngle = angle;
-    };
-
     var handleTouch = function(_e) {
-
         var e =  {type:_e.type, source:_e.source};
         e.x = _e.x * game.touchScaleX;
         e.y = _e.y * game.touchScaleY;
@@ -120,30 +70,7 @@ function MainScene(window, game) {
                     titleScreenTransform.duration = 1000;
                     titleScreenTransform.alpha = 0;
                     titleScreen.transform(titleScreenTransform);
-
-                    return;
-                } else {
-                    return;
                 }
-            }
-
-            if (brakeButton.contains(e.x, e.y)) {
-                if (braking) {
-                    carSpeed = DEFAULT_CAR_SPEED;
-                    brakeButton.color(1, 1, 1);
-                } else {
-                    carSpeed = DEFAULT_CAR_SPEED_WITH_BRAKE;
-                    brakeButton.color(0.5, 0.5, 0.5);
-                }
-                braking = !braking;
-            }
-        }
-
-        if (e.type == "touchend") {
-            handleCarControlPadAngle = 0;
-        } else {
-            if (carControlPad.contains(e.x, e.y)) {
-                handleCarControlPad(e);
             }
         }
     };
@@ -163,35 +90,10 @@ function MainScene(window, game) {
         }
     });
 
-    function lookAt(eyeX, eyeY, easing) {
-        var defaultCamera = game.defaultCamera;
-        var camera = game.camera;
-
-        if (eyeX < 500)  eyeX = 500;
-        if (eyeX > 1500) eyeX = 1500;
-        if (eyeY < 500)  eyeY = 500;
-        if (eyeY > 1500) eyeY = 1500;
-
-        var distanceX = camera.eyeX - eyeX;
-        var distanceY = camera.eyeY - eyeY;
-
-        var distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
-        lookAtTransform.duration = distance / 500 * 1000;
-
-        lookAtTransform.easing = easing;
-        lookAtTransform.lookAt_centerX = eyeX;
-        lookAtTransform.lookAt_centerY = eyeY;
-        lookAtTransform.lookAt_eyeX = eyeX;
-        lookAtTransform.lookAt_eyeY = eyeY;
-        lookAtTransform.lookAt_eyeZ = defaultCamera.eyeZ;
-
-        game.moveCamera(lookAtTransform);
-    }
-
     function zoomOut() {
         var defaultCamera = game.defaultCamera;
 
-        zoomOutTransform.duration = 1000;
+        zoomOutTransform.duration = 1;
         zoomOutTransform.easing = alloy.ANIMATION_CURVE_EASE_IN;
         zoomOutTransform.lookAt_centerX = track.width  * 0.5;
         zoomOutTransform.lookAt_centerY = track.height * 0.5;
@@ -205,23 +107,16 @@ function MainScene(window, game) {
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
-        myUUID = Titanium.Platform.createUUID();
 
         cars = [];
         started = false;
 
         cars[myCarIndex] = alloy.createSprite({image:'graphics/car1.png'});
-        cars[1] = alloy.createSprite({image:'graphics/car2.png'});
-        cars[2] = alloy.createSprite({image:'graphics/car3.png'});
+        cars.velX = DEFAULT_CAR_SPEED;
 
         if (updateTimerID > 0) {
             clearInterval(updateTimerID);
             updateTimerID = 0;
-        }
-
-        if (positionTimerID > 0) {
-            clearInterval(positionTimerID);
-            positionTimerID = 0;
         }
 
         if (track === null) {
@@ -250,52 +145,15 @@ function MainScene(window, game) {
             trackTransform = alloy.createTransform();
         }
 
-        if (carControlPad === null) {
-            carControlPad = alloy.createSprite({image:'graphics/control_base.png'});
-        }
-
-        if (brakeButton === null) {
-            brakeButton = alloy.createSprite({image:'graphics/A.png'});
-        }
-
         zoomOutTransform.addEventListener('complete', zoomOutCompleted);
         titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
-        trackTransform.addEventListener('complete', trackTransformCompleted);
+        trackTransform.addEventListener('complete', zoomOut);
 
-        cars[myCarIndex].x = 550;
-        cars[myCarIndex].y = 1610;
+        cars[myCarIndex].x = track.width * .5;
+        cars[myCarIndex].y = track.heigh * .5;
         cars[myCarIndex].z = track.z + 1;
 
         cars[myCarIndex].rotationCenter = {x:cars[myCarIndex].width * 0.5, y:cars[myCarIndex].height * 0.5};
-
-        cars[1].x = 550;
-        cars[1].y = 1680;
-        cars[1].z = track.z + 1;
-
-        cars[1].rotationCenter = {x:cars[1].width * 0.5, y:cars[1].height * 0.5};
-
-        cars[2].x = 550;
-        cars[2].y = 1750;
-        cars[2].z = track.z + 1;
-
-        cars[2].rotationCenter = {x:cars[2].width * 0.5, y:cars[2].height * 0.5};
-
-        carControlPad.width  = carControlPad.width  * 2;
-        carControlPad.height = carControlPad.height * 2;
-
-        brakeButton.width  = brakeButton.width  * 2;
-        brakeButton.height = brakeButton.height * 2;
-
-        carControlPad.x = game.STAGE_START.x;
-        carControlPad.y = game.screen.height - (carControlPad.height * 0.5);
-        carControlPad.z = 99;
-
-        brakeButton.x = game.STAGE_END.x - brakeButton.width;
-        brakeButton.y = game.screen.height - brakeButton.height;
-        brakeButton.z = 99;
-
-        carControlPad.hide();
-        brakeButton.hide();
 
         track.hide();
 
@@ -303,11 +161,6 @@ function MainScene(window, game) {
         self.add(track);
 
         self.add(cars[myCarIndex]);
-        self.add(cars[1]);
-        self.add(cars[2]);
-
-        game.addHUD(carControlPad);
-        game.addHUD(brakeButton);
 
         game.addEventListener('touchstart', handleTouch);
         game.addEventListener('touchmove',  handleTouch);
