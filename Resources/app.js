@@ -1,3 +1,5 @@
+var _ = require('libs/underscore-min')._;
+
 //bootstrap and check dependencies
 if (Ti.version < 1.8 ) {
     alert('Sorry - this application template requires Titanium Mobile SDK 1.8 or later');
@@ -10,5 +12,4 @@ if (Ti.version < 1.8 ) {
 (function() {
     var Window = require('ApplicationWindow');
     new Window().open({fullscreen:true, navBarHidden:true, exitOnClose:true});
-    var _ = require('libs/underscore-min')._;
 })();
