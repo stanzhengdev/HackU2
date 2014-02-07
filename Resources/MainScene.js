@@ -17,13 +17,16 @@ function MainScene(window, game) {
     var track = null;
     var titleScreen = null;
 
-    var lookAtTransform  = null;
+    var titleScreenTransform = null;
+    var trackTransform = null;
+
     var zoomOutTransform = null;
     var thrownEggTransform = null;
     var thrownEggScaleTransform = null;
 
     var bikes = [];
     var pedestrians = [];
+    var aboutCloseButton;
 
     var grandma;
     var grandmaThrow;
@@ -39,6 +42,9 @@ function MainScene(window, game) {
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 8;
     var PEDESTRIAN_SPEED = 2;
+
+    var MAX_DEATHS = 10;
+    var started = false;
 
     var score = 0;
     var scoreSprite;
@@ -115,8 +121,8 @@ function MainScene(window, game) {
             }
         }
 
-        scoreSprite.text = score;
-        deadCountSprite.text = "Crashes: \n" + deadCount;
+        scoreSprite.text = "Score: " + score;
+        deadCountSprite.text = "Crashes: " + deadCount;
 
         handleCollisions();
 
@@ -175,11 +181,31 @@ function MainScene(window, game) {
         }
     };
 
+    var resetGame = function() {
+        deadCount = 0;
+        for (var i in pedestrians) {
+            pedestriansToRemove.push(pedestrians[i]);
+            self.remove(pedestrians[i]);
+        }
+
+        for (var i in bikes) {
+            bikesToRemove.push(bikes[i]);
+            self.remove(bikes[i]);
+        }
+
+        score = 0;
+        reloadEggs();
+    };
+
     var handleCollisions = function () {
         for (var i in bikes) {
             for (var j in pedestrians) {
                 if (pedestrians[j].collidesWith(bikes[i])) {
                     deadCount++;
+                    if (deadCount >= MAX_DEATHS) {
+                        resetGame();
+                    }
+
                     bikesToRemove.push(bikes[i]);
                     pedestriansToRemove.push(pedestrians[j]);
                     self.remove(bikes[i]);
@@ -284,13 +310,13 @@ function MainScene(window, game) {
         grandmaThrow.z = track.z + 10;
         self.add(grandma);
         
-        scoreSprite = alloy.createTextSprite({text:'', fontSize:75});
+        scoreSprite = alloy.createTextSprite({text:'Score: 0', fontSize:75});
         scoreSprite.fontFamily = 'Chantelli_Antiqua';
-        scoreSprite.x = (track.width / 2 - scoreSprite.width) / 2;
+        scoreSprite.x = (track.width / 2 - scoreSprite.width) / 4;
         scoreSprite.y = 20;
         self.add(scoreSprite);
 
-        deadCountSprite = alloy.createTextSprite({text:"Crashes: \n 000", fontSize:24});
+        deadCountSprite = alloy.createTextSprite({text:"Crashes: 0", fontSize:24});
         deadCountSprite.fontFamily = 'Chantelli_Antiqua';
         deadCountSprite.x = track.width - deadCountSprite.width - 100;
         deadCountSprite.y = track.height - deadCountSprite.height - 50;
@@ -323,9 +349,29 @@ function MainScene(window, game) {
         }
     };
 
+    var titleScreenTransformCompleted = function(e) {
+        started = true;
+
+        track.show();
+
+        track.duration = 1500;
+        track.transform(trackTransform);
+    };
+
     var handleTouch = function(e) {
         if (e.type == "touchstart") {
-            if (!isThrowing) {
+            if (!started) {
+                if (e.x > 150 && e.x < 500 && e.y > 775 && e.y < 825) {
+                    openAbout();
+                    return;
+                }
+
+                if (titleScreen.alpha == 1) {
+                    titleScreenTransform.duration = 1000;
+                    titleScreenTransform.alpha = 0;
+                    titleScreen.transform(titleScreenTransform);
+                }
+            } else if (!isThrowing) {
                 throwEgg(e);
             }
         }
@@ -454,6 +500,17 @@ function MainScene(window, game) {
        webview_window.close(); 
     };
 
+    var openAbout = function() {
+        about_webview = Titanium.UI.createWebView({url:'http://dev.mateoj.com/hacku/present.htm'});
+        about_webview_window = Titanium.UI.createWindow();
+        about_webview_window.add(about_webview);
+        about_webview_window.open({modal:true});
+        about_webview_window.add(aboutCloseButton);
+    };
+    var closeAbout = function() {
+        about_webview_window.close();
+    };
+
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
@@ -463,16 +520,26 @@ function MainScene(window, game) {
         webview_window.open({modal:true});
         button = Titanium.UI.createButton({
             title: 'Close',
-            button: 20,
+            top: 20,
+            right: 20,
+            width: 150,
+            height: 100
+        });
+        aboutCloseButton = Titanium.UI.createButton({
+            title: 'Close',
+            top: 20,
+            right: 20,
             width: 150,
             height: 100
         });
         webview_window.add(button);
         setTimeout(hideWebView, 10000);
         button.addEventListener('click', hideWebView);
+        aboutCloseButton.addEventListener('click', closeAbout);
 
         bikes = [];
         pedestrians = [];
+        started = false;
 
         if (track === null) {
             track = alloy.createSprite({image:'assets/background_d.png'});
@@ -480,16 +547,20 @@ function MainScene(window, game) {
         }
 
         if (titleScreen === null) {
-            titleScreen = alloy.createSprite({image:'graphics/titlescreen.png'});
+            titleScreen = alloy.createSprite({image:'assets/titlescreen.png'});
             titleScreen.tag = "TITLE_SCREEN";
-        }
-
-        if (lookAtTransform === null) {
-            lookAtTransform = alloy.createTransform();
         }
 
         if (zoomOutTransform === null) {
             zoomOutTransform = alloy.createTransform();
+        }
+
+        if (titleScreenTransform === null) {
+            titleScreenTransform = alloy.createTransform();
+        }
+
+        if (trackTransform === null) {
+            trackTransform = alloy.createTransform();
         }
 
         if (thrownEggTransform === null) {
@@ -501,10 +572,13 @@ function MainScene(window, game) {
         }
 
         zoomOutTransform.addEventListener('complete', zoomOutCompleted);
+        titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
+        trackTransform.addEventListener('complete', zoomOut);
         thrownEggTransform.addEventListener('complete', thrownEggCompleted);
 
         track.hide();
 
+        self.add(titleScreen);
         self.add(track);
 
         game.addEventListener('touchstart', handleTouch);
@@ -512,9 +586,6 @@ function MainScene(window, game) {
         game.addEventListener('touchend',   handleTouch);
 
         game.startCurrentScene();
-        track.show();
-
-        zoomOut();
     });
 
     self.addEventListener('deactivated', function(e) {
