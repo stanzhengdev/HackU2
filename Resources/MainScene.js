@@ -24,6 +24,7 @@ function MainScene(window, game) {
     var zoomOutTransform = null;
 
     var bikes = [];
+    var pedestrians = [];
 
     var grandma;
     var grandmaThrow;
@@ -35,6 +36,7 @@ function MainScene(window, game) {
 
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 10;
+    var PEDESTRIAN_SPEED = 2;
 
     var started = false;
 
@@ -57,40 +59,74 @@ function MainScene(window, game) {
     ];
 
     var pedestrianSprites = [
-        'assets/cycle1.png',
-        'assets/cycle2.png',
-        'assets/cycle3.png',
-        'assets/cycle4.png',
-        'assets/cycle5.png',
-        'assets/cycle6.png',
-        'assets/cycle7.png',
-        'assets/cycle8.png',
-        'assets/cycle9.png',
-        'assets/cycle10.png'
+        'assets/pedestrian_1.png'
     ];
 
     var isThrowing = false;
 
     var updateTimer = function(e) {
         var bikesToRemove = [];
+        var pedestriansToRemove = [];
         for (var i in bikes) {
             bikes[i].x += bikes[i].velX;
-            bikes[i].y += bikes[i].velY;
 
-            if ((bikes[i].x > track.width + bikes[i].width && bikes[i].velX > 0) || (bikes[i].x < -100 && bikes[i].velX < 0)) {
+            if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < bikes[i].width && bikes[i].velX < 0)) {
                 self.remove(bikes[i]);
                 bikesToRemove.push(bikes[i]);
             }
         }
 
+        for (var i in pedestrians) {
+            pedestrians[i].y += pedestrians[i].velY;
+
+            if ((pedestrians[i].y > track.height && pedestrians[i].velY > 0) || (pedestrians[i].y < pedestrians[i].height && pedestrians[i].velY < 0)) {
+                self.remove(pedestrians[i]);
+                pedestriansToRemove.push(pedestrians[i]);
+            }
+        }
+
         bikes = _.difference(bikes, bikesToRemove);
+        pedestrians = _.difference(pedestrians, pedestriansToRemove);
+        for (var i in bikesToRemove) {
+            bikesToRemove[i].dispose();
+        }
+
+        for (var i in pedestriansToRemove) {
+            pedestriansToRemove[i].dispose();
+        }
 
         scoreSprite.text = score;
+
+        handleCollisions();
+    };
+
+    var handleCollisions = function () {
+        var bikesToRemove = [];
+        var pedestriansToRemove = [];
+        for (var i in bikes) {
+            for (var j in pedestrians) {
+                if (pedestrians[j].collidesWith(bikes[i])) {
+                    score--;
+                    bikesToRemove.push(bikes[i]);
+                    pedestriansToRemove.push(pedestrians[j]);
+                    self.remove(bikes[i]);
+                    self.remove(pedestrians[j]);
+                }
+            }
+        }
+
+        bikes = _.difference(bikes, bikesToRemove);
+        pedestrians = _.difference(pedestrians, pedestriansToRemove);
 
         for (var i in bikesToRemove) {
             bikesToRemove[i].dispose();
         }
-    };
+
+        for (var i in pedestriansToRemove) {
+            pedestriansToRemove[i].dispose();
+        }
+
+    }
 
     var spawnOuterLaneBikes = function (e) {
         var newBike;
@@ -107,12 +143,14 @@ function MainScene(window, game) {
                 self.add(grandma);
                 isThrowing = false;
             }
+            newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -OUTER_LANE_SPEED;
             newBike.velY = 0;
             newBike.x = track.width + newBike.width;
             newBike.y = 70;
+            newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
             newBike.scaleX = -1;
             if (!isThrowing) {
                 self.remove(grandma);
@@ -121,7 +159,6 @@ function MainScene(window, game) {
             }
         }
 
-        newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
@@ -136,25 +173,52 @@ function MainScene(window, game) {
             newBike.velX = INNER_LANE_SPEED;
             newBike.x = -newBike.width;
             newBike.y = 360;
+            newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         } else {
             newBike = alloy.createSprite({image:spriteImage});
             newBike.velX = -INNER_LANE_SPEED;
             newBike.x = track.width + newBike.width;
             newBike.y = 220;
+            newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
             newBike.scaleX = -1;
         }
 
         newBike.velY = 0;
-        newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         newBike.z = track.z + 1;
         self.add(newBike);
         bikes.push(newBike);
+    };
+
+    var spawnPedestrians = function (e) {
+        var newPedestrian;
+        var spriteImage = pedestrianSprites[Math.floor((Math.random()*pedestrianSprites.length))];
+
+        if (Math.random() > 0.5) {
+            newPedestrian = alloy.createSprite({image:spriteImage});
+            newPedestrian.velY = PEDESTRIAN_SPEED;
+            newPedestrian.y = 0 - newPedestrian.height;
+            newPedestrian.rotationCenter = {x:newPedestrian.width * 0.5, y:newPedestrian.height * 0.5};
+        } else {
+            newPedestrian = alloy.createSprite({image:spriteImage});
+            newPedestrian.velY = -PEDESTRIAN_SPEED;
+            newPedestrian.y = track.height;
+            newPedestrian.rotationCenter = {x:newPedestrian.width * 0.5, y:newPedestrian.height * 0.5};
+            newPedestrian.angle = 180;
+        }
+
+        newPedestrian.x = track.width * 0.5;
+        newPedestrian.velX = 0;
+        newPedestrian.z = track.z + 1;
+        self.add(newPedestrian);
+        pedestrians.push(newPedestrian);
     };
 
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
         setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+2000));
         setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+2000));
+
+        setInterval(spawnPedestrians, Math.floor((Math.random()*2000)+4000));
 
         grandma = alloy.createSprite({image:'assets/grandma_1.png'});
         grandma.x = (track.width - grandma.width) / 2;
@@ -255,6 +319,7 @@ function MainScene(window, game) {
         Ti.API.info("main scene is activated");
 
         bikes = [];
+        pedestrians = [];
         started = false;
 
         if (track === null) {
