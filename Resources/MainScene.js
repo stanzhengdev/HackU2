@@ -42,6 +42,9 @@ function MainScene(window, game) {
 
     var score = 0;
     var scoreSprite;
+    var jostleBike = null;
+    var jostleOrigY;
+    var jostleDuration = 0;
 
     var bikeSprites = [
         'assets/cycle1.png',
@@ -63,6 +66,15 @@ function MainScene(window, game) {
     ];
 
     var isThrowing = false;
+    var pickBikeToJostle = function() {
+        if (bikes.length > 0) {
+            jostleBike = bikes[Math.floor(bikes.length * Math.random())];
+            jostleOrigY = jostleBike.y;
+            jostleDuration = 10;
+        } else {
+            jostleBike = null;
+        }
+    };
 
     var updateTimer = function(e) {
         var bikesToRemove = [];
@@ -70,9 +82,12 @@ function MainScene(window, game) {
         for (var i in bikes) {
             bikes[i].x += bikes[i].velX;
 
-            if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < bikes[i].width && bikes[i].velX < 0)) {
+            if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < -bikes[i].width && bikes[i].velX < 0)) {
                 self.remove(bikes[i]);
                 bikesToRemove.push(bikes[i]);
+                if (bikes[i] == jostleBike) {
+                    jostleBike = null;
+                }
             }
         }
 
@@ -98,6 +113,17 @@ function MainScene(window, game) {
         scoreSprite.text = score;
 
         handleCollisions();
+
+        if (jostleBike != null) {
+            jostleBike.y = jostleOrigY + (Math.sin(jostleDuration) * 3.0);
+            jostleDuration--;
+            if(jostleDuration <= 0) {
+                jostleBike.y = jostleOrigY;
+                pickBikeToJostle();
+            }
+        } else {
+            pickBikeToJostle();
+        }
     };
 
     var handleCollisions = function () {
@@ -111,6 +137,9 @@ function MainScene(window, game) {
                     pedestriansToRemove.push(pedestrians[j]);
                     self.remove(bikes[i]);
                     self.remove(pedestrians[j]);
+                    if (bikes[i] == jostleBike) {
+                        jostleBike = null;
+                    }
                 }
             }
         }
@@ -125,8 +154,7 @@ function MainScene(window, game) {
         for (var i in pedestriansToRemove) {
             pedestriansToRemove[i].dispose();
         }
-
-    }
+    };
 
     var spawnOuterLaneBikes = function (e) {
         var newBike;
