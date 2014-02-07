@@ -254,6 +254,7 @@ function MainScene(window, game) {
             newPedestrian.velY = -PEDESTRIAN_SPEED;
             newPedestrian.y = track.height;
             newPedestrian.rotationCenter = {x:newPedestrian.width * 0.5, y:newPedestrian.height * 0.5};
+            newPedestrian.scaleFromCenter(-1, 1, newPedestrian.width * 0.5, newPedestrian.height * 0.5);
         }
 
         newPedestrian.type = type;
