@@ -6,7 +6,6 @@ var alloy = require('co.lanica.platino');
 function LoadingScene(window, game) {
     var self = alloy.createScene();
     
-    var progressBar   = null;
     var loadingScreen = null;
     var loadingBanner = null;
     var loadingBadge  = null;
@@ -62,26 +61,17 @@ function LoadingScene(window, game) {
         "assets/npc8_b.png",
         "assets/npc8_c.png",
         "assets/npc8_d.png",
-        "assets/startscreen.png",
         "assets/windgauge.png"
     ];
 
     var startloadingAssets = function(e) {
-        if (progressBar === null) return;
-        if (loadingCount === 0) {
-            window.add(progressBar);
-            progressBar.show();
-        }
         if (loadingCount < loadingTextures.length) {
             game.loadTexture(loadingTextures[loadingCount]);
             
             loadingCount = loadingCount + 1;
-            progressBar.value = loadingCount;
-
+            loadingScreen.y = -game.screen.height * (loadingTextures.length - loadingCount) / loadingTextures.length;
             setTimeout(startloadingAssets, 100);
         } else {
-            progressBar.hide();
-            
             var MainScene     = require("MainScene");
             game.currentScene = new MainScene(window, game);
             game.replaceScene(game.currentScene);
@@ -99,34 +89,13 @@ function LoadingScene(window, game) {
                 tag:'LOADING_SCREEN'});
         }
         
-        var bgfactor = game.screen.height / loadingScreen.height;
+        var bgfactor = 2 * game.screen.height / loadingScreen.height;
         loadingScreen.width  = loadingScreen.width * bgfactor;
-        loadingScreen.height = game.screen.height;
+        loadingScreen.height = game.screen.height * 2;
+        loadingScreen.center = {x:game.screen.width * 0.5, y:game.screen.height * 0.5};
+        loadingScreen.y = -game.screen.height;
                 
-        if (loadingScreen.width < game.screen.width) {
-            loadingScreen.center = {x:game.screen.width * 0.5, y:game.screen.height * 0.5};
-        } else {
-            loadingScreen.x = game.STAGE_START.x;
-            loadingScreen.y = game.STAGE_START.y;
-        }
         self.add(loadingScreen);
-
-        if (progressBar === null) {
-            progressBar = Titanium.UI.createProgressBar({
-                width :  loadingScreen.width * 0.3 / game.touchScaleX,
-                height : loadingScreen.height * 0.2 / game.touchScaleY,
-                min : 0,
-                max : loadingTextures.length,
-                value : 0,
-                color : '#888',
-                message : '',
-                style : Titanium.UI.iPhone.ProgressBarStyle.PLAIN
-            });
-            progressBar.center = {
-                x : (game.screen.width * 0.5 / game.touchScaleX),
-                y : (loadingScreen.height * 0.845 / game.touchScaleY)
-            };
-        }
     });
     
     self.addEventListener('deactivated', function(e) {
@@ -135,11 +104,6 @@ function LoadingScene(window, game) {
         if (loadingScreen !== null) {
             self.remove(loadingScreen);
             loadingScreen = null;
-        }
-        
-        if (progressBar !== null) {
-            window.remove(progressBar);
-            progressBar = null;
         }
         
         game.unloadTextureByTag('LOADING_SCREEN');
