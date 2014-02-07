@@ -482,6 +482,9 @@ function MainScene(window, game) {
                 pedestriansToRemove.push(pedestrians[i]);
                 score -= 10;
                 deadCount++;
+                if (deadCount >= MAX_DEATHS) {
+                    showEndScreen();
+                }
             }
         }
     };
@@ -565,21 +568,21 @@ function MainScene(window, game) {
         }
 
         if (titleScreen === null) {
-            titleScreen = alloy.createSprite({image:'assets/titlescreen.png'});
+            titleScreen = alloy.createSprite({image:'assets/start1.png'});
             titleScreen.tag = "TITLE_SCREEN";
         }
 
         if (endScreen === null) {
             endScreen = alloy.createSprite({image:'assets/end1.png'});
-            endScreen.z = track.z + 500;
+            endScreen.z = track.z + 20;
             endScreen.hide();
         }
 
         scoreSpriteEnd = alloy.createTextSprite({text:'Score: 0', fontSize:75});
         scoreSpriteEnd.fontFamily = 'Chantelli_Antiqua';
-        scoreSpriteEnd.x = 200;
-        scoreSpriteEnd.y = 400;
-        scoreSpriteEnd.z = track.z = 600;
+        scoreSpriteEnd.x = 180;
+        scoreSpriteEnd.y = 380;
+        scoreSpriteEnd.z = track.z + 21;
         scoreSpriteEnd.color(1, 1, 1);
         scoreSpriteEnd.hide();
 
