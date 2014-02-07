@@ -22,6 +22,8 @@ function MainScene(window, game) {
 
     var lookAtTransform  = null;
     var zoomOutTransform = null;
+    var thrownEggTransform = null;
+    var thrownEggScaleTransform = null;
 
     var bikes = [];
     var pedestrians = [];
@@ -33,6 +35,7 @@ function MainScene(window, game) {
     var timer;
     var eggs = [];
     var rottenEggs = [];
+    var thrownEgg = null;
 
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 10;
@@ -76,18 +79,15 @@ function MainScene(window, game) {
         }
     };
 
+    var bikesToRemove = [];
+    var pedestriansToRemove = [];
     var updateTimer = function(e) {
-        var bikesToRemove = [];
-        var pedestriansToRemove = [];
         for (var i in bikes) {
             bikes[i].x += bikes[i].velX;
 
             if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < -bikes[i].width && bikes[i].velX < 0)) {
                 self.remove(bikes[i]);
                 bikesToRemove.push(bikes[i]);
-                if (bikes[i] == jostleBike) {
-                    jostleBike = null;
-                }
             }
         }
 
@@ -98,16 +98,6 @@ function MainScene(window, game) {
                 self.remove(pedestrians[i]);
                 pedestriansToRemove.push(pedestrians[i]);
             }
-        }
-
-        bikes = _.difference(bikes, bikesToRemove);
-        pedestrians = _.difference(pedestrians, pedestriansToRemove);
-        for (var i in bikesToRemove) {
-            bikesToRemove[i].dispose();
-        }
-
-        for (var i in pedestriansToRemove) {
-            pedestriansToRemove[i].dispose();
         }
 
         scoreSprite.text = score;
@@ -124,11 +114,25 @@ function MainScene(window, game) {
         } else {
             pickBikeToJostle();
         }
+
+        while (bikesToRemove.length > 0) {
+            var bikeToRemove = bikesToRemove.pop();
+            if (bikeToRemove == jostleBike) {
+                jostleBike = null;
+            }
+
+            bikeToRemove.dispose();
+            bikes = _.without(bikes, bikeToRemove);
+        }
+
+        while (pedestriansToRemove.length > 0) {
+            var pedestrianToRemove = pedestriansToRemove.pop();
+            pedestrianToRemove.dispose();
+            pedestrians = _.without(pedestrians, pedestrianToRemove);
+        }
     };
 
     var handleCollisions = function () {
-        var bikesToRemove = [];
-        var pedestriansToRemove = [];
         for (var i in bikes) {
             for (var j in pedestrians) {
                 if (pedestrians[j].collidesWith(bikes[i])) {
@@ -137,22 +141,8 @@ function MainScene(window, game) {
                     pedestriansToRemove.push(pedestrians[j]);
                     self.remove(bikes[i]);
                     self.remove(pedestrians[j]);
-                    if (bikes[i] == jostleBike) {
-                        jostleBike = null;
-                    }
                 }
             }
-        }
-
-        bikes = _.difference(bikes, bikesToRemove);
-        pedestrians = _.difference(pedestrians, pedestriansToRemove);
-
-        for (var i in bikesToRemove) {
-            bikesToRemove[i].dispose();
-        }
-
-        for (var i in pedestriansToRemove) {
-            pedestriansToRemove[i].dispose();
         }
     };
 
@@ -166,11 +156,6 @@ function MainScene(window, game) {
             newBike.velY = 0;
             newBike.x = -newBike.width;
             newBike.y = 510;
-            if (isThrowing) {
-                self.remove(grandmaThrow);
-                self.add(grandma);
-                isThrowing = false;
-            }
             newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
         } else {
             newBike = alloy.createSprite({image:spriteImage});
@@ -180,11 +165,6 @@ function MainScene(window, game) {
             newBike.y = 70;
             newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
             newBike.scaleFromCenter(-1, 1, newBike.width * 0.5, newBike.height * 0.5);
-            if (!isThrowing) {
-                self.remove(grandma);
-                self.add(grandmaThrow);
-                isThrowing = true;
-            }
         }
 
         newBike.z = track.z + 1;
@@ -259,7 +239,8 @@ function MainScene(window, game) {
         self.add(grandma);
         
         scoreSprite = alloy.createTextSprite({text:'', fontSize:24});
-        scoreSprite.x = (track.width - scoreSprite.width) / 2;
+        scoreSprite.fontFamily = 'Chantelli_Antiqua';
+        scoreSprite.x = (track.width / 2 - scoreSprite.width) / 2;
         scoreSprite.y = 30;
         self.add(scoreSprite);
 
@@ -298,11 +279,7 @@ function MainScene(window, game) {
         track.transform(trackTransform);
     };
 
-    var handleTouch = function(_e) {
-        var e =  {type:_e.type, source:_e.source};
-        e.x = _e.x * game.touchScaleX;
-        e.y = _e.y * game.touchScaleY;
-
+    var handleTouch = function(e) {
         if (e.type == "touchstart") {
             if (!started) {
                 if (titleScreen.alpha == 1) {
@@ -310,9 +287,50 @@ function MainScene(window, game) {
                     titleScreenTransform.alpha = 0;
                     titleScreen.transform(titleScreenTransform);
                 }
+            } else if (!isThrowing) {
+                throwProjectile(e);
             }
         }
     };
+
+    var throwProjectile = function(e) {
+        var x = e.x * game.touchScaleX - 75;
+        var y = e.y * game.touchScaleY - 15
+
+        self.remove(grandma);
+        self.add(grandmaThrow);
+        isThrowing = true;
+
+        thrownEgg = alloy.createSprite({image:'assets/eggtray-egg.png'});
+        thrownEgg.x = grandma.x + grandma.width - 50;
+        thrownEgg.y = grandma.y + 50;
+        thrownEgg.z = grandma.z - 1;
+        thrownEgg.scaleX = 3;
+        thrownEgg.scaleY = 3;
+        self.add(thrownEgg);
+
+        thrownEggTransform.duration = 500;
+        thrownEggTransform.x = x;
+        thrownEggTransform.y = y;
+        thrownEggTransform.easing = alloy.ANIMATION_CURVE_QUAD_IN_OUT;
+        thrownEggTransform.scaleX = 0.3;
+        thrownEggTransform.scaleY = 0.3;
+        thrownEgg.transform(thrownEggTransform);
+    }
+
+    var thrownEggCompleted = function() {
+        self.remove(grandmaThrow);
+        self.add(grandma);
+        isThrowing = false;
+
+        for (var i in bikes) {
+            if (bikes[i].contains(thrownEgg.x, thrownEgg.y)) {
+                self.remove(bikes[i]);
+                bikesToRemove.push(bikes[i]);
+                score++;
+            }
+        }
+    }
 
     self.addEventListener('onloadsprite', function(e) {
         Ti.API.info("onloadsprite: " + e.tag);
@@ -376,9 +394,18 @@ function MainScene(window, game) {
             trackTransform = alloy.createTransform();
         }
 
+        if (thrownEggTransform === null) {
+            thrownEggTransform = alloy.createTransform();
+        }
+
+        if (thrownEggScaleTransform === null) {
+            thrownEggScaleTransform = alloy.createTransform();
+        }
+
         zoomOutTransform.addEventListener('complete', zoomOutCompleted);
         titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
         trackTransform.addEventListener('complete', zoomOut);
+        thrownEggTransform.addEventListener('complete', thrownEggCompleted);
 
         track.hide();
 
