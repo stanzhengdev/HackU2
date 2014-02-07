@@ -17,9 +17,6 @@ function MainScene(window, game) {
     var track = null;
     var titleScreen = null;
 
-    var titleScreenTransform = null;
-    var trackTransform = null;
-
     var lookAtTransform  = null;
     var zoomOutTransform = null;
     var thrownEggTransform = null;
@@ -42,8 +39,6 @@ function MainScene(window, game) {
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 8;
     var PEDESTRIAN_SPEED = 2;
-
-    var started = false;
 
     var score = 0;
     var scoreSprite;
@@ -121,7 +116,7 @@ function MainScene(window, game) {
         }
 
         scoreSprite.text = score;
-        deadCountSprite.text = "Deaths: \n" + deadCount;
+        deadCountSprite.text = "Crashes: \n" + deadCount;
 
         handleCollisions();
 
@@ -295,10 +290,11 @@ function MainScene(window, game) {
         scoreSprite.y = 20;
         self.add(scoreSprite);
 
-        deadCountSprite = alloy.createTextSprite({text:'000', fontSize:75});
+        deadCountSprite = alloy.createTextSprite({text:"Crashes: \n 000", fontSize:24});
         deadCountSprite.fontFamily = 'Chantelli_Antiqua';
-        deadCountSprite.x = track.width - deadCountSprite.width - 20;
-        deadCountSprite.y = track.height - deadCountSprite.height - 20;;
+        deadCountSprite.x = track.width - deadCountSprite.width - 100;
+        deadCountSprite.y = track.height - deadCountSprite.height - 50;
+        deadCountSprite.z = grandma.z + 1;
         self.add(deadCountSprite);
 
         initializeEggs();
@@ -327,24 +323,9 @@ function MainScene(window, game) {
         }
     };
 
-    var titleScreenTransformCompleted = function(e) {
-        started = true;
-
-        track.show();
-
-        track.duration = 1500;
-        track.transform(trackTransform);
-    };
-
     var handleTouch = function(e) {
         if (e.type == "touchstart") {
-            if (!started) {
-                if (titleScreen.alpha == 1) {
-                    titleScreenTransform.duration = 1000;
-                    titleScreenTransform.alpha = 0;
-                    titleScreen.transform(titleScreenTransform);
-                }
-            } else if (!isThrowing) {
+            if (!isThrowing) {
                 throwEgg(e);
             }
         }
@@ -492,7 +473,6 @@ function MainScene(window, game) {
 
         bikes = [];
         pedestrians = [];
-        started = false;
 
         if (track === null) {
             track = alloy.createSprite({image:'assets/background_d.png'});
@@ -512,14 +492,6 @@ function MainScene(window, game) {
             zoomOutTransform = alloy.createTransform();
         }
 
-        if (titleScreenTransform === null) {
-            titleScreenTransform = alloy.createTransform();
-        }
-
-        if (trackTransform === null) {
-            trackTransform = alloy.createTransform();
-        }
-
         if (thrownEggTransform === null) {
             thrownEggTransform = alloy.createTransform();
         }
@@ -529,13 +501,10 @@ function MainScene(window, game) {
         }
 
         zoomOutTransform.addEventListener('complete', zoomOutCompleted);
-        titleScreenTransform.addEventListener('complete', titleScreenTransformCompleted);
-        trackTransform.addEventListener('complete', zoomOut);
         thrownEggTransform.addEventListener('complete', thrownEggCompleted);
 
         track.hide();
 
-        self.add(titleScreen);
         self.add(track);
 
         game.addEventListener('touchstart', handleTouch);
@@ -543,6 +512,9 @@ function MainScene(window, game) {
         game.addEventListener('touchend',   handleTouch);
 
         game.startCurrentScene();
+        track.show();
+
+        zoomOut();
     });
 
     self.addEventListener('deactivated', function(e) {

@@ -62,6 +62,7 @@ function LoadingScene(window, game) {
         "assets/npc8_b.png",
         "assets/npc8_c.png",
         "assets/npc8_d.png",
+        "assets/startscreen.png",
         "assets/windgauge.png"
     ];
 
@@ -94,7 +95,7 @@ function LoadingScene(window, game) {
         
         if (loadingScreen === null) {
             loadingScreen = alloy.createSprite({
-                image:'graphics/mainloading.png',
+                image:'assets/startscreen.png',
                 tag:'LOADING_SCREEN'});
         }
         
