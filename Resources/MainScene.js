@@ -34,11 +34,13 @@ function MainScene(window, game) {
     var eggTray;
     var timer;
     var eggs = [];
-    var rottenEggs = [];
+    var NUM_EGGS = 12;
+    var eggsLeft = NUM_EGGS;
+    var rottenEgg;
     var thrownEgg = null;
 
     var OUTER_LANE_SPEED = 5;
-    var INNER_LANE_SPEED = 10;
+    var INNER_LANE_SPEED = 8;
     var PEDESTRIAN_SPEED = 2;
 
     var started = false;
@@ -94,7 +96,8 @@ function MainScene(window, game) {
         for (var i in pedestrians) {
             pedestrians[i].y += pedestrians[i].velY;
 
-            if ((pedestrians[i].y > track.height && pedestrians[i].velY > 0) || (pedestrians[i].y < pedestrians[i].height && pedestrians[i].velY < 0)) {
+            if ((pedestrians[i].y > track.height && pedestrians[i].velY > 0) || (pedestrians[i].y < -pedestrians[i].height && pedestrians[i].velY < 0)) {
+                score += 10;
                 self.remove(pedestrians[i]);
                 pedestriansToRemove.push(pedestrians[i]);
             }
@@ -223,8 +226,8 @@ function MainScene(window, game) {
 
     var zoomOutCompleted = function(e) {
         setInterval(updateTimer, 33);
-        setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+2000));
-        setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+2000));
+        setInterval(spawnOuterLaneBikes, Math.floor((Math.random()*1000)+3000));
+        setInterval(spawnInnerLaneBikes, Math.floor((Math.random()*1000)+3000));
 
         setInterval(spawnPedestrians, Math.floor((Math.random()*2000)+4000));
 
@@ -254,9 +257,9 @@ function MainScene(window, game) {
         eggTray.z = track.z + 1;
         self.add(eggTray);
 
-        rottenEgg = Math.floor(Math.random() * 12);
+        rottenEgg = Math.floor(Math.random() * NUM_EGGS);
 
-        for (var i = 0; i < 12; i++) {
+        for (var i = 0; i < NUM_EGGS; i++) {
             var spriteImage = 'assets/eggtray-egg.png';
             if (i === rottenEgg) {
                 spriteImage = 'assets/eggtray-rotten.png';
@@ -288,20 +291,35 @@ function MainScene(window, game) {
                     titleScreen.transform(titleScreenTransform);
                 }
             } else if (!isThrowing) {
-                throwProjectile(e);
+                throwEgg(e);
             }
         }
     };
 
-    var throwProjectile = function(e) {
-        var x = e.x * game.touchScaleX - 75;
-        var y = e.y * game.touchScaleY - 15
+    var throwEgg = function(e) {
+        var x = e.x * game.touchScaleX;
+        var y = e.y * game.touchScaleY;
+        if (Ti.Platform.osname == "android") {
+            x -= 75;
+            y -= 15;
+        }
 
         self.remove(grandma);
         self.add(grandmaThrow);
-        isThrowing = true;
+        eggsLeft--;
+        if (eggsLeft > 0) {
+            isThrowing = true;
+            self.remove(eggs[eggsLeft]);
+        } else {
+            setTimeout(reloadEggs, 1000);
+        }
 
-        thrownEgg = alloy.createSprite({image:'assets/eggtray-egg.png'});
+        var eggSprite = 'assets/eggtray-egg.png';
+        if (eggsLeft === rottenEgg) {
+            eggSprite = 'assets/eggtray-rotten.png';
+        }
+
+        thrownEgg = alloy.createSprite({image:eggSprite});
         thrownEgg.x = grandma.x + grandma.width - 50;
         thrownEgg.y = grandma.y + 50;
         thrownEgg.z = grandma.z - 1;
@@ -316,6 +334,13 @@ function MainScene(window, game) {
         thrownEggTransform.scaleX = 0.3;
         thrownEggTransform.scaleY = 0.3;
         thrownEgg.transform(thrownEggTransform);
+    };
+
+    var reloadEggs = function() {
+        isThrowing = false;
+        for (var i = 0; i < NUM_EGGS; i++) {
+            self.add(eggs[i]);
+        }
     }
 
     var thrownEggCompleted = function() {
@@ -328,9 +353,20 @@ function MainScene(window, game) {
                 self.remove(bikes[i]);
                 bikesToRemove.push(bikes[i]);
                 score++;
+                if (eggsLeft === rottenEgg) {
+                    score += 5;
+                }
             }
         }
-    }
+
+        for (var i in pedestrians) {
+            if (pedestrians[i].contains(thrownEgg.x, thrownEgg.y)) {
+                self.remove(pedestrians[i]);
+                pedestriansToRemove.push(pedestrians[i]);
+                score -= 10;
+            }
+        }
+    };
 
     self.addEventListener('onloadsprite', function(e) {
         Ti.API.info("onloadsprite: " + e.tag);
