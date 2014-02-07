@@ -3,12 +3,13 @@ HackU2
 
 Dominion Hack-U2
 
-Welcome to ____ 
+Welcome to Neighborhood Watch 
 
 Citizens are out on a beautiful day 
-Motorists are running wild on the streets of norfolk. Pedestrians are in danger and no one one is safe.
+Motorists are running wild on the streets of norfolk.
+Pedestrians are in danger and no one one is safe.
 
-Grandma off her rocker and no ones safe.
+Grandma is grumpy and ready to protect her neighorhood
 
 
 Technologies
@@ -20,6 +21,6 @@ Twilio API
 Font Awesome
 
 
-Namelist
----
-MotorRenegade
+
+On the play store
+https://play.google.com/store/apps/details?id=com.DWS.neighborhoodwatch
