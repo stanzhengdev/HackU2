@@ -26,6 +26,7 @@ function MainScene(window, game) {
 
     var bikes = [];
     var pedestrians = [];
+    var aboutCloseButton;
 
     var grandma;
     var grandmaThrow;
@@ -360,6 +361,11 @@ function MainScene(window, game) {
     var handleTouch = function(e) {
         if (e.type == "touchstart") {
             if (!started) {
+                if (e.x > 150 && e.x < 500 && e.y > 775 && e.y < 825) {
+                    openAbout();
+                    return;
+                }
+
                 if (titleScreen.alpha == 1) {
                     titleScreenTransform.duration = 1000;
                     titleScreenTransform.alpha = 0;
@@ -494,6 +500,17 @@ function MainScene(window, game) {
        webview_window.close(); 
     };
 
+    var openAbout = function() {
+        about_webview = Titanium.UI.createWebView({url:'http://dev.mateoj.com/hacku/present.htm'});
+        about_webview_window = Titanium.UI.createWindow();
+        about_webview_window.add(about_webview);
+        about_webview_window.open({modal:true});
+        about_webview_window.add(aboutCloseButton);
+    };
+    var closeAbout = function() {
+        about_webview_window.close();
+    };
+
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
 
@@ -508,9 +525,17 @@ function MainScene(window, game) {
             width: 150,
             height: 100
         });
+        aboutCloseButton = Titanium.UI.createButton({
+            title: 'Close',
+            top: 20,
+            right: 20,
+            width: 150,
+            height: 100
+        });
         webview_window.add(button);
         setTimeout(hideWebView, 10000);
         button.addEventListener('click', hideWebView);
+        aboutCloseButton.addEventListener('click', closeAbout);
 
         bikes = [];
         pedestrians = [];
@@ -522,7 +547,7 @@ function MainScene(window, game) {
         }
 
         if (titleScreen === null) {
-            titleScreen = alloy.createSprite({image:'graphics/titlescreen.png'});
+            titleScreen = alloy.createSprite({image:'assets/titlescreen.png'});
             titleScreen.tag = "TITLE_SCREEN";
         }
 
