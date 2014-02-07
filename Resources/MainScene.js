@@ -9,6 +9,7 @@ var alloy = require('co.lanica.platino');
 function MainScene(window, game) {
     var _ = require('libs/underscore-min')._;
 
+    var showingEndScreen = false;
     var debug = true;
     var button;
     // Create scene
@@ -16,6 +17,7 @@ function MainScene(window, game) {
 
     var track = null;
     var titleScreen = null;
+    var endScreen = null;
 
     var titleScreenTransform = null;
     var trackTransform = null;
@@ -48,6 +50,7 @@ function MainScene(window, game) {
 
     var score = 0;
     var scoreSprite;
+    var scoreSpriteEnd;
     var deadCount = 0;
     var deadCountSprite = 0;
     var jostleBike = null;
@@ -181,6 +184,20 @@ function MainScene(window, game) {
         }
     };
 
+    var showEndScreen = function () {
+        showingEndScreen = true;
+        endScreen.show();
+        scoreSpriteEnd.text = "Score: " + score;
+        scoreSpriteEnd.show();
+    };
+
+    var hideEndScreen = function () {
+        showingEndScreen = false;
+        endScreen.hide();
+        resetGame();
+        scoreSpriteEnd.hide();
+    };
+
     var resetGame = function() {
         deadCount = 0;
         for (var i in pedestrians) {
@@ -203,7 +220,7 @@ function MainScene(window, game) {
                 if (pedestrians[j].collidesWith(bikes[i])) {
                     deadCount++;
                     if (deadCount >= MAX_DEATHS) {
-                        resetGame();
+                        showEndScreen();
                     }
 
                     bikesToRemove.push(bikes[i]);
@@ -360,7 +377,9 @@ function MainScene(window, game) {
 
     var handleTouch = function(e) {
         if (e.type == "touchstart") {
-            if (!started) {
+            if (showingEndScreen) {
+                hideEndScreen();
+            } else if (!started) {
                 if (e.x > 150 && e.x < 500 && e.y > 775 && e.y < 825) {
                     openAbout();
                     return;
@@ -463,6 +482,9 @@ function MainScene(window, game) {
                 pedestriansToRemove.push(pedestrians[i]);
                 score -= 10;
                 deadCount++;
+                if (deadCount >= MAX_DEATHS) {
+                    showEndScreen();
+                }
             }
         }
     };
@@ -533,7 +555,6 @@ function MainScene(window, game) {
             height: 100
         });
         webview_window.add(button);
-        setTimeout(hideWebView, 10000);
         button.addEventListener('click', hideWebView);
         aboutCloseButton.addEventListener('click', closeAbout);
 
@@ -547,9 +568,23 @@ function MainScene(window, game) {
         }
 
         if (titleScreen === null) {
-            titleScreen = alloy.createSprite({image:'assets/titlescreen.png'});
+            titleScreen = alloy.createSprite({image:'assets/start1.png'});
             titleScreen.tag = "TITLE_SCREEN";
         }
+
+        if (endScreen === null) {
+            endScreen = alloy.createSprite({image:'assets/end1.png'});
+            endScreen.z = track.z + 20;
+            endScreen.hide();
+        }
+
+        scoreSpriteEnd = alloy.createTextSprite({text:'Score: 0', fontSize:75});
+        scoreSpriteEnd.fontFamily = 'Chantelli_Antiqua';
+        scoreSpriteEnd.x = 190;
+        scoreSpriteEnd.y = 3;
+        scoreSpriteEnd.z = track.z + 21;
+        scoreSpriteEnd.color(1, 1, 1);
+        scoreSpriteEnd.hide();
 
         if (zoomOutTransform === null) {
             zoomOutTransform = alloy.createTransform();
@@ -579,6 +614,8 @@ function MainScene(window, game) {
         track.hide();
 
         self.add(titleScreen);
+        self.add(endScreen);
+        self.add(scoreSpriteEnd);
         self.add(track);
 
         game.addEventListener('touchstart', handleTouch);

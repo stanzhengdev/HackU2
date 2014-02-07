@@ -85,7 +85,7 @@ function LoadingScene(window, game) {
         
         if (loadingScreen === null) {
             loadingScreen = alloy.createSprite({
-                image:'assets/startscreen.png',
+                image:'assets/loading_screen.png',
                 tag:'LOADING_SCREEN'});
         }
         
