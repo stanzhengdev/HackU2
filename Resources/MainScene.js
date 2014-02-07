@@ -343,7 +343,7 @@ function MainScene(window, game) {
         self.remove(grandma);
         self.add(grandmaThrow);
         eggsLeft--;
-        if (eggsLeft > 0) {
+        if (eggsLeft >= 0) {
             self.remove(eggs[eggsLeft]);
         }
 
