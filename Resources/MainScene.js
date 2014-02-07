@@ -70,8 +70,8 @@ function MainScene(window, game) {
         ['assets/npc1_a.png', 'assets/npc1_b.png', 'assets/npc1_c.png', 'assets/npc1_d.png'],
         ['assets/npc2_a.png', 'assets/npc2_b.png', 'assets/npc2_c.png', 'assets/npc2_d.png'],
         ['assets/npc3_a.png', 'assets/npc3_b.png', 'assets/npc3_c.png', 'assets/npc3_d.png'],
-        ['assets/npc4_a.png', 'assets/npc4_b.png', 'assets/npc4_c.png', 'assets/npc4_d.png'],
-        ['assets/npc5_a.png', 'assets/npc5_b.png', 'assets/npc5_c.png', 'assets/npc5_d.png'],
+        ['assets/npc4_a.png', 'assets/npc4_b.png'],
+        ['assets/npc5_a.png', 'assets/npc5_b.png'],
         ['assets/npc6_a.png', 'assets/npc6_b.png', 'assets/npc6_c.png', 'assets/npc6_d.png'],
         ['assets/npc7_a.png', 'assets/npc7_b.png', 'assets/npc7_c.png', 'assets/npc7_d.png'],
         ['assets/npc8_a.png', 'assets/npc8_b.png', 'assets/npc8_c.png', 'assets/npc8_d.png']
