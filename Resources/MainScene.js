@@ -10,7 +10,7 @@ function MainScene(window, game) {
     var _ = require('libs/underscore-min')._;
 
     var debug = true;
-
+    var button;
     // Create scene
     var self = alloy.createScene();
 
@@ -47,9 +47,14 @@ function MainScene(window, game) {
 
     var score = 0;
     var scoreSprite;
+    var deadCount = 0;
+    var deadCountSprite = 0;
     var jostleBike = null;
     var jostleOrigY;
     var jostleDuration = 0;
+
+    var webview;
+    var webview_window;
 
     var bikeSprites = [
         'assets/cycle1.png',
@@ -116,6 +121,7 @@ function MainScene(window, game) {
         }
 
         scoreSprite.text = score;
+        deadCountSprite.text = "Deaths: \n" + deadCount;
 
         handleCollisions();
 
@@ -178,7 +184,7 @@ function MainScene(window, game) {
         for (var i in bikes) {
             for (var j in pedestrians) {
                 if (pedestrians[j].collidesWith(bikes[i])) {
-                    score--;
+                    deadCount++;
                     bikesToRemove.push(bikes[i]);
                     pedestriansToRemove.push(pedestrians[j]);
                     self.remove(bikes[i]);
@@ -283,11 +289,17 @@ function MainScene(window, game) {
         grandmaThrow.z = track.z + 10;
         self.add(grandma);
         
-        scoreSprite = alloy.createTextSprite({text:'', fontSize:24});
+        scoreSprite = alloy.createTextSprite({text:'', fontSize:75});
         scoreSprite.fontFamily = 'Chantelli_Antiqua';
         scoreSprite.x = (track.width / 2 - scoreSprite.width) / 2;
-        scoreSprite.y = 30;
+        scoreSprite.y = 20;
         self.add(scoreSprite);
+
+        deadCountSprite = alloy.createTextSprite({text:'000', fontSize:75});
+        deadCountSprite.fontFamily = 'Chantelli_Antiqua';
+        deadCountSprite.x = track.width - deadCountSprite.width - 20;
+        deadCountSprite.y = track.height - deadCountSprite.height - 20;;
+        self.add(deadCountSprite);
 
         initializeEggs();
     };
@@ -423,6 +435,7 @@ function MainScene(window, game) {
                 self.remove(pedestrians[i]);
                 pedestriansToRemove.push(pedestrians[i]);
                 score -= 10;
+                deadCount++;
             }
         }
     };
@@ -456,8 +469,26 @@ function MainScene(window, game) {
         game.moveCamera(zoomOutTransform);
     }
 
+    var hideWebView = function() {
+       webview_window.close(); 
+    };
+
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
+
+        webview = Titanium.UI.createWebView({url:'http://dev.mateoj.com/hacku/phpservice'});
+        webview_window = Titanium.UI.createWindow();
+        webview_window.add(webview);
+        webview_window.open({modal:true});
+        button = Titanium.UI.createButton({
+            title: 'Close',
+            button: 20,
+            width: 150,
+            height: 100
+        });
+        webview_window.add(button);
+        setTimeout(hideWebView, 10000);
+        button.addEventListener('click', hideWebView);
 
         bikes = [];
         pedestrians = [];
