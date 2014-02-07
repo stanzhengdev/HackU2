@@ -28,6 +28,10 @@ function MainScene(window, game) {
     var grandma;
     var grandmaThrow;
 
+    var eggCarton;
+    var timer;
+    var eggs = [];
+
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 10;
 
@@ -79,8 +83,15 @@ function MainScene(window, game) {
         }
 
         bikes = _.difference(bikes, bikesToRemove);
+
         score++;
-        scoreSprite.text = score;
+        if (score % 20 == 0) {
+            scoreSprite.text = score;
+        }
+
+        for (var i in bikesToRemove) {
+            bikesToRemove[i].dispose();
+        }
     };
 
     var spawnOuterLaneBikes = function (e) {
@@ -96,6 +107,7 @@ function MainScene(window, game) {
             if (isThrowing) {
                 self.remove(grandmaThrow);
                 self.add(grandma);
+                isThrowing = false;
             }
         } else {
             newBike = alloy.createSprite({image:spriteImage});
@@ -107,6 +119,7 @@ function MainScene(window, game) {
             if (!isThrowing) {
                 self.remove(grandma);
                 self.add(grandmaThrow);
+                isThrowing = true;
             }
         }
 
@@ -154,10 +167,13 @@ function MainScene(window, game) {
         grandmaThrow.y = track.height - grandmaThrow.height;
         grandmaThrow.z = track.z + 10;
         self.add(grandma);
+        
         scoreSprite = alloy.createTextSprite({text:'Lorem ipsum dolor sit amet.', fontSize:24});
         scoreSprite.x = (track.width - scoreSprite.width) / 2;
         scoreSprite.y = 0;
         self.add(scoreSprite);
+
+        
     };
 
     var titleScreenTransformCompleted = function(e) {
@@ -221,7 +237,7 @@ function MainScene(window, game) {
         started = false;
 
         if (track === null) {
-            track = alloy.createSprite({image:'assets/background.png'});
+            track = alloy.createSprite({image:'assets/background_c.png'});
             track.tag = "TRACK";
         }
 
