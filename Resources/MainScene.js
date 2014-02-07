@@ -67,10 +67,18 @@ function MainScene(window, game) {
     ];
 
     var pedestrianSprites = [
-        'assets/pedestrian_1.png'
+        ['assets/pedestrian_1.png'],
+        ['assets/npc1_a.png', 'assets/npc1_b.png', 'assets/npc1_c.png', 'assets/npc1_d.png']
     ];
 
     var isThrowing = false;
+    var isReloading = false;
+
+    var bikesToRemove = [];
+    var pedestriansToRemove = [];
+
+    var animationDelay = 0;
+
     var pickBikeToJostle = function() {
         if (bikes.length > 0) {
             jostleBike = bikes[Math.floor(bikes.length * Math.random())];
@@ -81,8 +89,6 @@ function MainScene(window, game) {
         }
     };
 
-    var bikesToRemove = [];
-    var pedestriansToRemove = [];
     var updateTimer = function(e) {
         for (var i in bikes) {
             bikes[i].x += bikes[i].velX;
@@ -132,6 +138,33 @@ function MainScene(window, game) {
             var pedestrianToRemove = pedestriansToRemove.pop();
             pedestrianToRemove.dispose();
             pedestrians = _.without(pedestrians, pedestrianToRemove);
+        }
+
+        animationDelay++;
+        if (animationDelay % 5 == 0) {
+            animatePedestrians();
+
+            if (isReloading) {
+                blinkEggTray();
+            }
+        }
+    };
+
+    var animatePedestrians = function() {
+        for (var i in pedestrians) {
+            pedestrians[i].currentFrame++;
+            if (pedestrians[i].currentFrame > pedestrianSprites[pedestrians[i].type].length - 1) {
+                pedestrians[i].currentFrame = 0;
+            }
+            pedestrians[i].image = pedestrianSprites[pedestrians[i].type][pedestrians[i].currentFrame];
+        }
+    };
+
+    var blinkEggTray = function() {
+        if (eggTray.alpha == 0) {
+            eggTray.show();
+        } else {
+            eggTray.hide();
         }
     };
 
@@ -202,7 +235,8 @@ function MainScene(window, game) {
 
     var spawnPedestrians = function (e) {
         var newPedestrian;
-        var spriteImage = pedestrianSprites[Math.floor((Math.random()*pedestrianSprites.length))];
+        var type = Math.floor((Math.random()*pedestrianSprites.length));
+        var spriteImage = pedestrianSprites[type][0];
 
         if (Math.random() > 0.5) {
             newPedestrian = alloy.createSprite({image:spriteImage});
@@ -217,6 +251,8 @@ function MainScene(window, game) {
             newPedestrian.angle = 180;
         }
 
+        newPedestrian.type = type;
+        newPedestrian.currentFrame = 0;
         newPedestrian.x = track.width * 0.5;
         newPedestrian.velX = 0;
         newPedestrian.z = track.z + 1;
@@ -308,11 +344,10 @@ function MainScene(window, game) {
         self.add(grandmaThrow);
         eggsLeft--;
         if (eggsLeft > 0) {
-            isThrowing = true;
             self.remove(eggs[eggsLeft]);
-        } else {
-            setTimeout(reloadEggs, 1000);
         }
+
+        isThrowing = true;
 
         var eggSprite = 'assets/eggtray-egg.png';
         if (eggsLeft === rottenEgg) {
@@ -330,6 +365,7 @@ function MainScene(window, game) {
         thrownEggTransform.duration = 500;
         thrownEggTransform.x = x;
         thrownEggTransform.y = y;
+        thrownEggTransform.z = track.z + 0.5;
         thrownEggTransform.easing = alloy.ANIMATION_CURVE_QUAD_IN_OUT;
         thrownEggTransform.scaleX = 0.3;
         thrownEggTransform.scaleY = 0.3;
@@ -338,15 +374,24 @@ function MainScene(window, game) {
 
     var reloadEggs = function() {
         isThrowing = false;
+        isReloading = false;
+        eggTray.show();
         for (var i = 0; i < NUM_EGGS; i++) {
             self.add(eggs[i]);
         }
+
+        eggsLeft = NUM_EGGS;
     }
 
     var thrownEggCompleted = function() {
         self.remove(grandmaThrow);
         self.add(grandma);
-        isThrowing = false;
+        if (eggsLeft > 0) {
+            isThrowing = false;
+        } else {
+            isReloading = true;
+            setTimeout(reloadEggs, 1000);
+        }
 
         for (var i in bikes) {
             if (bikes[i].contains(thrownEgg.x, thrownEgg.y)) {

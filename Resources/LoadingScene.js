@@ -12,7 +12,34 @@ function LoadingScene(window, game) {
     var loadingBadge  = null;
     
     var loadingCount = 0;
-    var loadingTextures = ["graphics/track.png", "graphics/titlescreen.png"];
+    var loadingTextures = [
+        "assets/background_d.png",
+        "assets/bus1.png",
+        "assets/bus2.png",
+        "assets/cycle10.png",
+        "assets/cycle1.png",
+        "assets/cycle2.png",
+        "assets/cycle3.png",
+        "assets/cycle4.png",
+        "assets/cycle5.png",
+        "assets/cycle6.png",
+        "assets/cycle7.png",
+        "assets/cycle8.png",
+        "assets/cycle9.png",
+        "assets/eggtray-egg.png",
+        "assets/eggtray-mockup.png",
+        "assets/eggtray.png",
+        "assets/eggtray-rotten.png",
+        "assets/grandma_1.png",
+        "assets/grandma_2.png",
+        "assets/npc1_a.png",
+        "assets/npc1_b.png",
+        "assets/npc1_c.png",
+        "assets/npc1_d.png",
+        "assets/pedestrian_1.png",
+        "assets/windgauge.png",
+        "graphics/titlescreen.png"
+    ];
 
     var startloadingAssets = function(e) {
         if (progressBar === null) return;
