@@ -82,7 +82,7 @@ function MainScene(window, game) {
         for (var i in bikes) {
             bikes[i].x += bikes[i].velX;
 
-            if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < bikes[i].width && bikes[i].velX < 0)) {
+            if ((bikes[i].x > track.width && bikes[i].velX > 0) || (bikes[i].x < -bikes[i].width && bikes[i].velX < 0)) {
                 self.remove(bikes[i]);
                 bikesToRemove.push(bikes[i]);
                 if (bikes[i] == jostleBike) {
