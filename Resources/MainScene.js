@@ -580,8 +580,8 @@ function MainScene(window, game) {
 
         scoreSpriteEnd = alloy.createTextSprite({text:'Score: 0', fontSize:75});
         scoreSpriteEnd.fontFamily = 'Chantelli_Antiqua';
-        scoreSpriteEnd.x = 180;
-        scoreSpriteEnd.y = 380;
+        scoreSpriteEnd.x = 190;
+        scoreSpriteEnd.y = 3;
         scoreSpriteEnd.z = track.z + 21;
         scoreSpriteEnd.color(1, 1, 1);
         scoreSpriteEnd.hide();
