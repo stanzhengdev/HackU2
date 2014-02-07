@@ -151,7 +151,7 @@ function MainScene(window, game) {
             newBike.x = track.width + newBike.width;
             newBike.y = 70;
             newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
-            newBike.scaleX = -1;
+            newBike.scaleFromCenter(-1, 1, newBike.width * 0.5, newBike.height * 0.5);
             if (!isThrowing) {
                 self.remove(grandma);
                 self.add(grandmaThrow);
@@ -180,7 +180,7 @@ function MainScene(window, game) {
             newBike.x = track.width + newBike.width;
             newBike.y = 220;
             newBike.rotationCenter = {x:newBike.width * 0.5, y:newBike.height * 0.5};
-            newBike.scaleX = -1;
+            newBike.scaleFromCenter(-1, 1, newBike.width * 0.5, newBike.height * 0.5);
         }
 
         newBike.velY = 0;
@@ -323,7 +323,7 @@ function MainScene(window, game) {
         started = false;
 
         if (track === null) {
-            track = alloy.createSprite({image:'assets/background_c.png'});
+            track = alloy.createSprite({image:'assets/background_d.png'});
             track.tag = "TRACK";
         }
 
