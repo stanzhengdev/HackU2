@@ -24,6 +24,8 @@ function MainScene(window, game) {
     var zoomOutTransform = null;
 
     var bikes = [];
+    
+    
 
     var grandma;
     var grandmaThrow;
@@ -70,6 +72,8 @@ function MainScene(window, game) {
     ];
 
     var isThrowing = false;
+    
+    var ad = [];
 
     var updateTimer = function(e) {
         var bikesToRemove = [];
@@ -253,6 +257,11 @@ function MainScene(window, game) {
 
     self.addEventListener('activated', function(e) {
         Ti.API.info("main scene is activated");
+        
+        var webview = Titanium.UI.createWebView({url:'http://dev.mateoj.com/hacku/phpservice'});
+    	var webview_window = Titanium.UI.createWindow();
+    	webview_window.add(webview);
+    	webview_window.open({modal:true});
 
         bikes = [];
         started = false;
