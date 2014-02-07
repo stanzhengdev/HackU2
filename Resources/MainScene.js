@@ -28,6 +28,11 @@ function MainScene(window, game) {
     var grandma;
     var grandmaThrow;
 
+    var eggTray;
+    var timer;
+    var eggs = [];
+    var rottenEggs = [];
+
     var OUTER_LANE_SPEED = 5;
     var INNER_LANE_SPEED = 10;
 
@@ -79,8 +84,12 @@ function MainScene(window, game) {
         }
 
         bikes = _.difference(bikes, bikesToRemove);
-        score++;
+
         scoreSprite.text = score;
+
+        for (var i in bikesToRemove) {
+            bikesToRemove[i].dispose();
+        }
     };
 
     var spawnOuterLaneBikes = function (e) {
@@ -96,6 +105,7 @@ function MainScene(window, game) {
             if (isThrowing) {
                 self.remove(grandmaThrow);
                 self.add(grandma);
+                isThrowing = false;
             }
         } else {
             newBike = alloy.createSprite({image:spriteImage});
@@ -107,6 +117,7 @@ function MainScene(window, game) {
             if (!isThrowing) {
                 self.remove(grandma);
                 self.add(grandmaThrow);
+                isThrowing = true;
             }
         }
 
@@ -154,10 +165,36 @@ function MainScene(window, game) {
         grandmaThrow.y = track.height - grandmaThrow.height;
         grandmaThrow.z = track.z + 10;
         self.add(grandma);
-        scoreSprite = alloy.createTextSprite({text:'Lorem ipsum dolor sit amet.', fontSize:24});
+        
+        scoreSprite = alloy.createTextSprite({text:'', fontSize:24});
         scoreSprite.x = (track.width - scoreSprite.width) / 2;
-        scoreSprite.y = 0;
+        scoreSprite.y = 30;
         self.add(scoreSprite);
+
+        initializeEggs();
+    };
+
+    var initializeEggs = function() {
+        eggTray = alloy.createSprite({image:'assets/eggtray.png'});
+        eggTray.x = 20;
+        eggTray.y = track.height - eggTray.height - 20;
+        eggTray.z = track.z + 1;
+        self.add(eggTray);
+
+        rottenEgg = Math.floor(Math.random() * 12);
+
+        for (var i = 0; i < 12; i++) {
+            var spriteImage = 'assets/eggtray-egg.png';
+            if (i === rottenEgg) {
+                spriteImage = 'assets/eggtray-rotten.png';
+            }
+
+            eggs[i] = alloy.createSprite({image:spriteImage});
+            eggs[i].x = 36 + (i % 6) * 32;
+            eggs[i].y = eggTray.y + 16 + (Math.floor(i / 6) * 32);
+            eggs[i].z = track.z + 2;
+            self.add(eggs[i]);
+        }
     };
 
     var titleScreenTransformCompleted = function(e) {
@@ -221,7 +258,7 @@ function MainScene(window, game) {
         started = false;
 
         if (track === null) {
-            track = alloy.createSprite({image:'assets/background.png'});
+            track = alloy.createSprite({image:'assets/background_c.png'});
             track.tag = "TRACK";
         }
 
