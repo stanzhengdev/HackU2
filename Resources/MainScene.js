@@ -67,8 +67,14 @@ function MainScene(window, game) {
     ];
 
     var pedestrianSprites = [
-        ['assets/pedestrian_1.png'],
-        ['assets/npc1_a.png', 'assets/npc1_b.png', 'assets/npc1_c.png', 'assets/npc1_d.png']
+        ['assets/npc1_a.png', 'assets/npc1_b.png', 'assets/npc1_c.png', 'assets/npc1_d.png'],
+        ['assets/npc2_a.png', 'assets/npc2_b.png', 'assets/npc2_c.png', 'assets/npc2_d.png'],
+        ['assets/npc3_a.png', 'assets/npc3_b.png', 'assets/npc3_c.png', 'assets/npc3_d.png'],
+        ['assets/npc4_a.png', 'assets/npc4_b.png'],
+        ['assets/npc5_a.png', 'assets/npc5_b.png'],
+        ['assets/npc6_a.png', 'assets/npc6_b.png', 'assets/npc6_c.png', 'assets/npc6_d.png'],
+        ['assets/npc7_a.png', 'assets/npc7_b.png', 'assets/npc7_c.png', 'assets/npc7_d.png'],
+        ['assets/npc8_a.png', 'assets/npc8_b.png', 'assets/npc8_c.png', 'assets/npc8_d.png']
     ];
 
     var isThrowing = false;
@@ -248,7 +254,7 @@ function MainScene(window, game) {
             newPedestrian.velY = -PEDESTRIAN_SPEED;
             newPedestrian.y = track.height;
             newPedestrian.rotationCenter = {x:newPedestrian.width * 0.5, y:newPedestrian.height * 0.5};
-            newPedestrian.angle = 180;
+            newPedestrian.scaleFromCenter(-1, 1, newPedestrian.width * 0.5, newPedestrian.height * 0.5);
         }
 
         newPedestrian.type = type;
@@ -386,6 +392,14 @@ function MainScene(window, game) {
     var thrownEggCompleted = function() {
         self.remove(grandmaThrow);
         self.add(grandma);
+
+        thrownEgg.image = 'assets/egg_1.png';
+        thrownEgg.scaleX = 1;
+        thrownEgg.scaleY = 1;
+        if (eggsLeft == rottenEgg) {
+            thrownEgg.image = 'assets/egg_2.png';
+        }
+
         if (eggsLeft > 0) {
             isThrowing = false;
         } else {
