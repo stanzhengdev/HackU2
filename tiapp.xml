@@ -9,13 +9,13 @@
         <target device="blackberry">false</target>
     </deployment-targets>
     <sdk-version>3.2.0.GA</sdk-version>
-    <id>co.lanica.platino.codestrong.car</id>
-    <name>CodestrongCar</name>
+    <id>com.DWS.neighborhoodwatch</id>
+    <name>Neighborhood Watch</name>
     <version>1.0</version>
-    <publisher>iguchi</publisher>
-    <url>http://lanica.co/</url>
+    <publisher>Dominion Enterprises</publisher>
+    <url>http://www.dominionenterprises.com/</url>
     <description>not specified</description>
-    <copyright>2012 by iguchi</copyright>
+    <copyright>2012 by Dominion Enterprises</copyright>
     <icon>appicon.png</icon>
     <persistent-wifi>false</persistent-wifi>
     <prerendered-icon>false</prerendered-icon>
