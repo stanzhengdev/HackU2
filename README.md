@@ -19,7 +19,7 @@ Jose Mateo @jmate003
 Onapha Rattana @cosmicmeow  
 Trisha Tobias @aureately  
 Anthony Bittle @guywithnose 
-Chris Ryan @chrisryan 
+Chris Ryan@chrisryan  
 Brandon   
 Krishna   
 
