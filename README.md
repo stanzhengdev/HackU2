@@ -12,6 +12,18 @@ Pedestrians are in danger and no one one is safe.
 Grandma is grumpy and ready to protect her neighorhood
 
 
+Created by
+----
+Stanley Zheng @stanzheng
+Jose Mateo @jmate003
+Onapha Rattana @cosmicmeow
+Trisha Tobias @aureately
+Anthony Bittle @guywithnose
+Chris Ryan @chrisryan
+Brandon 
+Krishna 
+
+
 Technologies
 ----
 Appcelerator Titanium
@@ -24,3 +36,5 @@ Font Awesome
 
 On the play store
 https://play.google.com/store/apps/details?id=com.DWS.neighborhoodwatch
+
+
