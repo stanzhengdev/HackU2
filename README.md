@@ -5,14 +5,12 @@ Dominion Hack-U2
 
 Welcome to Neighborhood Watch 
 
-Citizens are out on a beautiful day 
-Motorists are running wild on the streets of norfolk.
-Pedestrians are in danger and no one one is safe.
+A pack of reckless motorists have invaded your neighborhood. Protect your neighbors as they cross the street by egging the cars before anyone gets hurt.
 
-Grandma is grumpy and ready to protect her neighorhood
+We had a lot of fun making this app at the Dominion Enterprises University Hackathon 2. If you want to help make the app better we'll accept pull requests
 
 
-Created with love by
+Created with love by The Grumpies
 ----
 Stanley Zheng @stanzheng  http://github.com/stanzheng   
 Jose Mateo @jmate003  http://github.com/jmate003    
@@ -26,12 +24,12 @@ Krishna
 
 Technologies
 ----
-Appcelerator Titanium
-Lanica's Platino Game Engine
-Cycle Trader API 
-Twilio API
-Font Awesome
-
+Appcelerator Titanium   
+Lanica's Platino Game Engine    
+Cycle Trader API    
+Twilio API    
+Font Awesome    
+Twitter Bootstrap
 
 
 On the play store
