@@ -12,7 +12,7 @@ Pedestrians are in danger and no one one is safe.
 Grandma is grumpy and ready to protect her neighorhood
 
 
-Created by
+Created with love by
 ----
 Stanley Zheng @stanzheng  http://github.com/stanzheng   
 Jose Mateo @jmate003  http://github.com/jmate003    
