@@ -14,12 +14,12 @@ Grandma is grumpy and ready to protect her neighorhood
 
 Created by
 ----
-Stanley Zheng @stanzheng  
-Jose Mateo @jmate003  
-Onapha Rattana @cosmicmeow  
-Trisha Tobias @aureately  
-Anthony Bittle @guywithnose 
-Chris Ryan@chrisryan  
+Stanley Zheng @stanzheng  http://github.com/stanzheng   
+Jose Mateo @jmate003  http://github.com/jmate003    
+Onapha Rattana @cosmicmeow   http://github.com/cosmicmeow   
+Trisha Tobias @aureately  http://github.com/aureately   
+Anthony Bittle @guywithnose   http://github.com/guywithnose   
+Chris Ryan @chrisryan  http://github.com/chrisryan    
 Brandon   
 Krishna   
 
