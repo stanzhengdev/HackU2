@@ -18,7 +18,7 @@ Onapha Rattana @cosmicmeow   http://github.com/cosmicmeow
 Trisha Tobias @aureately  http://github.com/aureately   
 Anthony Bittle @guywithnose   http://github.com/guywithnose   
 Chris Ryan @chrisryan  http://github.com/chrisryan    
-Brandon   
+Brandon Beigay 
 Krishna   
 
 
