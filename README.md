@@ -10,6 +10,8 @@ A pack of reckless motorists have invaded your neighborhood. Protect your neighb
 We had a lot of fun making this app at the Dominion Enterprises University Hackathon 2. If you want to help make the app better we'll accept pull requests
 
 
+Blog Entry: https://medium.com/@StanZheng/dominion-enterprises-hack-university-hackathon-cacebac25944
+
 Created with love by The Grumpies
 ----
 Stanley Zheng @stanzheng  http://github.com/stanzheng   
