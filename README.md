@@ -15,7 +15,7 @@ Blog Entry: https://medium.com/@StanZheng/dominion-enterprises-hack-university-h
 Created with love by The Grumpies
 ----
 Stanley Zheng @stanzheng  http://github.com/stanzheng   
-Jose Mateo @jmate003  http://github.com/jmate003    
+Jose Mateo @jmate003  http://github.com/j-mateo    
 Onapha Rattana @cosmicmeow   http://github.com/cosmicmeow   
 Trisha Tobias @aureately  http://github.com/aureately   
 Anthony Bittle @guywithnose   http://github.com/guywithnose   
